@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "description": "Invite-only 2026 international football sweepstake",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/atk0309/the-sweep.git"
