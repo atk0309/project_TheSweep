@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #05100a; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+  @keyframes flood { 0%,100% { opacity: .5; } 50% { opacity: .82; } }
+  @keyframes livedot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(.55); opacity: .45; } }
+  @keyframes pop { 0% { opacity: 0; transform: translateY(16px) scale(.6); } 60% { opacity: 1; } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes screenIn { 0% { opacity: 0; transform: translateY(10px); } 100% { opacity: 1; transform: none; } }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  @keyframes packGlow { 0%,100% { box-shadow: 0 0 55px rgba(0,230,118,.45), 0 24px 60px rgba(0,0,0,.6); transform: translateY(0) rotate(-2deg); } 50% { box-shadow: 0 0 95px rgba(0,230,118,.8), 0 24px 60px rgba(0,0,0,.6); transform: translateY(-7px) rotate(-2deg); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes sweep { 0% { transform: translateX(-120%) skewX(-18deg); } 100% { transform: translateX(320%) skewX(-18deg); } }
+  @keyframes flash { 0% { opacity: 0; } 12% { opacity: .9; } 100% { opacity: 0; } }
+  @keyframes beam { 0% { opacity: 0; transform: translate(-50%,-50%) scaleX(.18) scaleY(.55); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%,-50%) scaleX(1.7) scaleY(1.35); } }
+  @keyframes cardFlash { 0% { opacity: .9; transform: scale(.82); } 100% { opacity: 0; transform: scale(1.18); } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition-duration: .01ms !important; } }
+  /* Keep the bottom nav clear of the iOS home indicator everywhere. */
+  .tabbar { padding-bottom: calc(26px + env(safe-area-inset-bottom)) !important; }
+  /* On real phones, drop the desktop "phone mockup" frame and fill the live
+     viewport (100dvh tracks the browser chrome so the nav bar is never hidden). */
+  @media (max-width: 520px) {
+    html, body { height: 100%; overflow: hidden; }
+    .app-shell { min-height: 0 !important; height: 100vh !important; height: 100dvh !important; padding: 0 !important; gap: 0 !important; overflow: hidden !important; }
+    .app-frame { width: 100% !important; max-width: none !important; height: 100vh !important; height: 100dvh !important; border-radius: 0 !important; padding: 0 !important; box-shadow: none !important; }
+    .app-screen { border-radius: 0 !important; }
+    .device-statusbar { display: none !important; }
+  }
+</style>
+</helmet>
+
+<div class="app-shell" style="min-height:100vh;width:100%;background:radial-gradient(120% 80% at 50% 0%,#0a2014 0%,#05100a 55%,#030a06 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px 16px;font-family:'Barlow',system-ui,sans-serif;">
+
+  <div class="app-frame" style="position:relative;width:412px;height:892px;border-radius:54px;background:#020a06;padding:7px;box-shadow:0 50px 90px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.04),inset 0 0 0 1px rgba(255,255,255,.03);">
+    <div class="app-screen" style="position:relative;width:100%;height:100%;border-radius:47px;overflow:hidden;background:#04110a;">
+
+      <!-- floodlight ambient base -->
+      <div style="position:absolute;inset:0;background:radial-gradient(100% 55% at 50% -6%,rgba(0,230,118,.28) 0%,rgba(0,230,118,0) 60%),radial-gradient(70% 40% at 12% 8%,rgba(120,255,180,.16),transparent 60%),radial-gradient(70% 40% at 88% 8%,rgba(120,255,180,.16),transparent 60%);animation:flood 6s ease-in-out infinite;pointer-events:none;z-index:0;"></div>
+      <div style="position:absolute;left:0;right:0;bottom:0;height:42%;background:repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0 2px,transparent 2px 46px),linear-gradient(180deg,transparent,rgba(0,40,18,.5));pointer-events:none;z-index:0;"></div>
+
+      <!-- confetti -->
+      <canvas ref="{{ canvasRef }}" style="position:absolute;inset:0;width:100%;height:100%;z-index:60;pointer-events:none;"></canvas>
+
+      <!-- ══════════ LANDING ══════════ -->
+      <sc-if value="{{ isLanding }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;overflow-y:auto;animation:screenIn .45s ease both;">
+        <div style="position:relative;padding:64px 26px 22px;">
+          <!-- floodlight poles -->
+          <div style="position:absolute;top:36px;left:30px;width:46px;height:14px;border-radius:8px;background:linear-gradient(180deg,#dfffe9,#7ef0a8);box-shadow:0 0 28px rgba(0,230,118,.7);transform:rotate(-12deg);"></div>
+          <div style="position:absolute;top:36px;right:30px;width:46px;height:14px;border-radius:8px;background:linear-gradient(180deg,#dfffe9,#7ef0a8);box-shadow:0 0 28px rgba(0,230,118,.7);transform:rotate(12deg);"></div>
+
+          <div style="display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);margin-bottom:18px;">
+            <svg width="11" height="13" viewBox="0 0 11 13"><path d="M5.5 1C3.6 1 2 2.6 2 4.5V6H1.5A1.5 1.5 0 000 7.5v3A1.5 1.5 0 001.5 12h8A1.5 1.5 0 0011 10.5v-3A1.5 1.5 0 009.5 6H9V4.5C9 2.6 7.4 1 5.5 1zm0 1.6c1 0 1.9.9 1.9 1.9V6H3.6V4.5c0-1 .9-1.9 1.9-1.9z" fill="#16ff7a"/></svg>
+            <span style="font-size:11px;font-weight:600;letter-spacing:1.6px;color:#16ff7a;">INVITE ONLY</span>
+          </div>
+
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:18px;letter-spacing:5px;color:#7fbf98;margin-bottom:-6px;">2026 FOOTBALL</div>
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:88px;line-height:.84;letter-spacing:-1px;color:#eafff0;text-transform:uppercase;text-shadow:0 0 40px rgba(0,230,118,.25);">The<br>Sweep<span style="color:#16ff7a;">.</span></div>
+          <p style="font-family:'Barlow';font-size:16px;color:#8fae9c;margin:16px 0 0;max-width:280px;line-height:1.35;">Your mates. 48 nations. One champion. Draw your teams, climb the board, talk all the trash.</p>
+        </div>
+
+        <div style="margin-top:auto;padding:14px 22px 30px;">
+          <sc-if value="{{ linkSent }}" hint-placeholder-val="{{ false }}">
+            <div style="border-radius:24px;padding:30px 22px;background:linear-gradient(180deg,rgba(10,38,22,.9),rgba(6,22,14,.95));border:1px solid rgba(0,230,118,.22);box-shadow:0 18px 50px rgba(0,0,0,.5);text-align:center;animation:rise .4s ease both;">
+              <div style="width:64px;height:64px;border-radius:20px;margin:0 auto 16px;background:rgba(0,230,118,.14);display:flex;align-items:center;justify-content:center;">
+                <svg width="30" height="24" viewBox="0 0 30 24"><rect x="1" y="2" width="28" height="20" rx="4" fill="none" stroke="#16ff7a" stroke-width="2"/><path d="M2 4l13 9 13-9" fill="none" stroke="#16ff7a" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div style="font-family:'Barlow Condensed';font-weight:700;font-size:30px;color:#eafff0;letter-spacing:.5px;">CHECK YOUR EMAIL</div>
+              <p style="font-size:14.5px;color:#8fae9c;margin:6px 0 20px;">We sent a magic link to <span style="color:#eafff0;">{{ email }}</span>. Tap it to jump in — no password, ever.</p>
+              <button onClick="{{ openMagic }}" style="width:100%;height:54px;border:none;border-radius:16px;background:linear-gradient(180deg,#1bff84,#00c95f);color:#022a14;font-family:'Barlow Condensed';font-weight:700;font-size:21px;letter-spacing:1px;cursor:pointer;box-shadow:0 10px 26px rgba(0,230,118,.4);">OPEN MAGIC LINK →</button>
+            </div>
+          </sc-if>
+          <sc-if value="{{ notSent }}" hint-placeholder-val="{{ true }}">
+            <div style="border-radius:24px;padding:22px;background:linear-gradient(180deg,rgba(10,30,19,.85),rgba(5,18,11,.92));border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);box-shadow:0 18px 50px rgba(0,0,0,.5);">
+              <label style="font-size:11px;font-weight:600;letter-spacing:1.8px;color:#7fbf98;">EMAIL</label>
+              <input value="{{ email }}" onInput="{{ onEmail }}" type="email" inputmode="email" placeholder="you@example.com" style="width:100%;height:50px;margin:9px 0 18px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.3);color:#eafff0;font-family:'Barlow';font-size:16px;padding:0 16px;outline:none;" />
+              <button onClick="{{ sendLink }}" style="{{ sendBtnStyle }}">
+                <span style="position:relative;z-index:1;">SEND MAGIC LINK</span>
+                <span style="position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:sweep 2.6s linear infinite;"></span>
+              </button>
+              <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;">
+                <svg width="11" height="13" viewBox="0 0 11 13"><path d="M5.5 1C3.6 1 2 2.6 2 4.5V6H1.5A1.5 1.5 0 000 7.5v3A1.5 1.5 0 001.5 12h8A1.5 1.5 0 0011 10.5v-3A1.5 1.5 0 009.5 6H9V4.5C9 2.6 7.4 1 5.5 1z" fill="#4f6757"/></svg>
+                <span style="font-size:12px;color:#5f7768;">Already invited? Enter your email for a fresh sign-in link.</span>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ ONBOARD ══════════ -->
+      <sc-if value="{{ isOnboard }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;overflow-y:auto;padding:70px 26px 30px;animation:screenIn .45s ease both;">
+        <div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;letter-spacing:4px;color:#7fbf98;">STEP 1 OF 1</div>
+        <div style="font-family:'Barlow Condensed';font-weight:800;font-size:46px;line-height:.92;color:#eafff0;text-transform:uppercase;margin:2px 0 26px;">Claim your<br>spot</div>
+
+        <div style="display:flex;justify-content:center;margin-bottom:8px;">
+          <div style="{{ previewTileStyle }}">{{ previewInitials }}</div>
+        </div>
+        <div style="text-align:center;font-size:13px;color:#7fbf98;letter-spacing:.5px;margin-bottom:24px;">YOUR MONOGRAM</div>
+
+        <label style="font-size:11px;font-weight:600;letter-spacing:1.8px;color:#7fbf98;">DISPLAY NAME</label>
+        <input value="{{ name }}" onInput="{{ onName }}" maxlength="14" placeholder="e.g. Leo" style="width:100%;height:52px;margin:9px 0 22px;border-radius:14px;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.3);color:#eafff0;font-family:'Barlow Condensed';font-weight:600;font-size:22px;letter-spacing:.5px;padding:0 16px;outline:none;" />
+
+        <label style="font-size:11px;font-weight:600;letter-spacing:1.8px;color:#7fbf98;">PICK YOUR COLOUR</label>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0 26px;">
+          <sc-for list="{{ monoOptions }}" as="o" hint-placeholder-count="8">
+            <div onClick="{{ o.onClick }}" style="{{ o.style }}"></div>
+          </sc-for>
+        </div>
+
+        <button onClick="{{ joinLobby }}" style="{{ joinBtnStyle }}">JOIN THE LOBBY →</button>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ LOBBY ══════════ -->
+      <sc-if value="{{ isLobby }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;overflow-y:auto;padding:60px 22px 26px;animation:screenIn .45s ease both;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div>
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;color:#eafff0;letter-spacing:.5px;line-height:1;text-transform:uppercase;">{{ sweepName }}</div>
+            <div style="font-size:12.5px;color:#7fbf98;letter-spacing:.5px;margin-top:2px;">Season 2026 · The waiting room</div>
+          </div>
+          <div style="display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:999px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.3);">
+            <span style="width:7px;height:7px;border-radius:50%;background:#16ff7a;animation:livedot 1.3s ease-in-out infinite;box-shadow:0 0 8px #16ff7a;"></span>
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;color:#16ff7a;">OPEN</span>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px;">
+          <div style="border-radius:20px;padding:18px 16px;background:linear-gradient(160deg,rgba(0,230,118,.16),rgba(6,22,14,.7));border:1px solid rgba(0,230,118,.2);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:54px;line-height:.85;color:#16ff7a;">{{ playersNum }}</div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#9fc8af;margin-top:4px;">PLAYERS IN</div>
+          </div>
+          <div style="border-radius:20px;padding:18px 16px;background:linear-gradient(160deg,rgba(255,255,255,.08),rgba(6,22,14,.7));border:1px solid rgba(255,255,255,.1);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:54px;line-height:.85;color:#eafff0;">{{ teamsNum }}</div>
+            <div style="font-size:12px;font-weight:600;letter-spacing:1px;color:#8fae9c;margin-top:4px;">TEAMS IN POT</div>
+          </div>
+        </div>
+
+        <div style="position:relative;text-align:center;margin-bottom:18px;">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;letter-spacing:3px;background:linear-gradient(90deg,#3f6b53,#eafff0,#3f6b53);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shimmer 3s linear infinite;">● WAITING FOR THE DRAW ●</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px 10px;margin-bottom:24px;">
+          <sc-for list="{{ lobbyTiles }}" as="p" hint-placeholder-count="11">
+            <div style="{{ p.box }}">
+              <div style="{{ p.square }}"><span style="{{ p.initStyle }}">{{ p.initials }}</span></div>
+              <div style="{{ p.nameStyle }}">{{ p.name }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:auto;">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:14px;">
+            <span style="font-size:12px;color:#5f7768;letter-spacing:.5px;">Viewing as</span>
+            <span style="{{ roleChip }}">{{ roleLabel }}</span>
+            <span style="color:#3f5347;font-size:12px;">·</span>
+            <span onClick="{{ logout }}" style="font-size:12px;color:#7fbf98;letter-spacing:.5px;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">Log out</span>
+          </div>
+          <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ true }}">
+            <!-- invite a player (pre-draw: this is the only way to add players) -->
+            <div style="border-radius:18px;padding:16px;margin-bottom:16px;background:linear-gradient(160deg,rgba(0,230,118,.08),rgba(255,255,255,.025));border:1px solid rgba(0,230,118,.2);">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <svg width="17" height="14" viewBox="0 0 30 24"><rect x="1" y="2" width="28" height="20" rx="4" fill="none" stroke="#16ff7a" stroke-width="2"/><path d="M2 4l13 9 13-9" fill="none" stroke="#16ff7a" stroke-width="2" stroke-linecap="round"/></svg>
+                <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#16ff7a;">INVITE A PLAYER</div>
+              </div>
+              <div style="font-size:12px;color:#7fbf98;margin-bottom:13px;line-height:1.35;">Sends a one-time sign-in link to their inbox. <span style="color:#bfe9cd;">The invite is what lets them in</span> — invite everyone before you run the draw.</div>
+              <div style="display:flex;gap:9px;margin-bottom:11px;">
+                <input value="{{ inviteEmail }}" onInput="{{ onInviteEmail }}" type="email" inputmode="email" placeholder="player@example.com" style="flex:1;min-width:0;height:48px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);color:#eafff0;font-family:'Barlow';font-size:15px;padding:0 14px;outline:none;" />
+              </div>
+              <button onClick="{{ sendInvite }}" style="{{ inviteBtnStyle }}">
+                <sc-if value="{{ inviteSending }}" hint-placeholder-val="{{ false }}"><span style="width:15px;height:15px;border:2px solid rgba(2,42,20,.4);border-top-color:#022a14;border-radius:50%;animation:spin 1s linear infinite;"></span></sc-if>
+                <span>{{ inviteBtnLabel }}</span>
+              </button>
+              <sc-if value="{{ inviteSent }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:7px;margin-top:11px;padding:9px 12px;border-radius:11px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.28);animation:rise .3s ease both;">
+                  <span style="width:18px;height:18px;border-radius:6px;background:#16ff7a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#022a14;flex:none;">✓</span>
+                  <span style="font-size:12.5px;color:#bfe9cd;">Invite delivered — their sign-in link is on its way.</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ hasSentInvites }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-top:13px;display:flex;flex-direction:column;gap:6px;">
+                  <sc-for list="{{ sentInvites }}" as="iv" hint-placeholder-count="2">
+                    <div style="display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+                      <svg width="13" height="13" viewBox="0 0 24 24" style="flex:none;"><path d="M5 12l5 5 9-11" fill="none" stroke="#16ff7a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      <span style="flex:1;min-width:0;font-family:'Barlow';font-size:13px;color:#cfe9d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ iv.email }}</span>
+                      <span style="font-size:10.5px;color:#5f7768;flex:none;">{{ iv.ago }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+            <button onClick="{{ runDraw }}" style="position:relative;overflow:hidden;width:100%;height:62px;border:none;border-radius:18px;background:linear-gradient(180deg,#1bff84,#00c95f);color:#022a14;font-family:'Barlow Condensed';font-weight:800;font-size:25px;letter-spacing:1.5px;cursor:pointer;box-shadow:0 14px 32px rgba(0,230,118,.42);">
+              <span style="position:relative;z-index:1;">⚡ RUN THE DRAW</span>
+              <span style="position:absolute;top:0;bottom:0;left:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);animation:sweep 2.4s linear infinite;"></span>
+            </button>
+            <div style="text-align:center;font-size:11.5px;color:#5f7768;margin-top:10px;">Admin only · irreversible once committed</div>
+          </sc-if>
+          <sc-if value="{{ isPlayer }}" hint-placeholder-val="{{ false }}">
+            <div style="width:100%;height:62px;border-radius:18px;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;gap:10px;">
+              <span style="width:16px;height:16px;border:2px solid rgba(0,230,118,.35);border-top-color:#16ff7a;border-radius:50%;animation:spin 1s linear infinite;"></span>
+              <span style="font-family:'Barlow Condensed';font-weight:600;font-size:18px;letter-spacing:1px;color:#8fae9c;">WAITING FOR ADMIN TO START…</span>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ DRAW ══════════ -->
+      <sc-if value="{{ isDraw }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;">
+
+        <!-- PRE: the pack -->
+        <sc-if value="{{ phasePre }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;animation:screenIn .4s ease both;">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;letter-spacing:6px;color:#7fbf98;margin-bottom:8px;">THE 2026 DRAW</div>
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:64px;line-height:.85;color:#eafff0;text-transform:uppercase;text-align:center;text-shadow:0 0 50px rgba(0,230,118,.35);margin-bottom:48px;">Open the<br>pot</div>
+          <div onClick="{{ openPack }}" style="cursor:pointer;width:188px;height:262px;border-radius:22px;background:linear-gradient(155deg,#0a3a22 0%,#022012 48%,#0a3a22 100%);border:1.5px solid rgba(0,230,118,.4);position:relative;overflow:hidden;animation:packGlow 2.6s ease-in-out infinite;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="position:absolute;top:0;bottom:0;left:0;width:55%;background:linear-gradient(90deg,transparent,rgba(120,255,180,.35),transparent);animation:sweep 2.8s linear infinite;"></div>
+            <div style="width:84px;height:84px;border-radius:50%;border:2px solid rgba(0,230,118,.5);display:flex;align-items:center;justify-content:center;box-shadow:0 0 30px rgba(0,230,118,.4) inset;">
+              <span style="font-family:'Barlow Condensed';font-weight:800;font-size:34px;color:#16ff7a;">26</span>
+            </div>
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:24px;letter-spacing:3px;color:#eafff0;margin-top:18px;">{{ teamsNum }} TEAMS</div>
+            <div style="font-size:11px;letter-spacing:2px;color:#7fbf98;margin-top:2px;">SEALED &amp; SHUFFLED</div>
+          </div>
+          <button onClick="{{ openPack }}" style="margin-top:40px;height:54px;padding:0 40px;border:none;border-radius:16px;background:linear-gradient(180deg,#1bff84,#00c95f);color:#022a14;font-family:'Barlow Condensed';font-weight:800;font-size:22px;letter-spacing:2px;cursor:pointer;box-shadow:0 12px 30px rgba(0,230,118,.42);">TAP TO OPEN</button>
+        </div>
+        </sc-if>
+
+        <!-- TEARING: pack rips open -->
+        <sc-if value="{{ phaseTearing }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;animation:screenIn .25s ease both;">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;letter-spacing:6px;color:#16ff7a;margin-bottom:8px;">OPENING…</div>
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:60px;line-height:.85;color:#eafff0;text-transform:uppercase;text-align:center;margin-bottom:54px;">The pot</div>
+          <div style="position:relative;width:188px;height:262px;">
+            <div style="position:absolute;left:50%;top:50%;width:140px;height:330px;border-radius:50%;background:radial-gradient(closest-side,rgba(170,255,210,.95),rgba(0,230,118,.45),transparent 75%);transform:translate(-50%,-50%);animation:beam .8s ease-out forwards;mix-blend-mode:screen;pointer-events:none;"></div>
+            <div style="{{ tearTopStyle }}"><div style="width:62px;height:62px;border-radius:50%;border:2px solid rgba(0,230,118,.5);display:flex;align-items:center;justify-content:center;margin-top:32px;"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;color:#16ff7a;">26</span></div></div>
+            <div style="{{ tearBotStyle }}"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;letter-spacing:3px;color:#eafff0;margin-bottom:28px;">{{ teamsNum }} TEAMS</span></div>
+          </div>
+          <div style="position:absolute;inset:0;background:radial-gradient(60% 42% at 50% 46%,#dfffe9,rgba(0,230,118,.3),transparent 70%);animation:flash .8s ease-out forwards;pointer-events:none;mix-blend-mode:screen;"></div>
+        </div>
+        </sc-if>
+
+        <!-- DEALING: pot grid fills -->
+        <sc-if value="{{ phaseDealing }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:64px 18px 24px;animation:screenIn .3s ease both;">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;color:#eafff0;text-transform:uppercase;letter-spacing:.5px;">Dealing teams</div>
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;color:#16ff7a;">{{ dealtLabel }}</div>
+          </div>
+          <div style="height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;margin-bottom:20px;">
+            <div style="{{ dealBarStyle }}"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:7px;">
+            <sc-for list="{{ cells }}" as="c" hint-placeholder-count="48">
+              <div style="{{ c.box }}">
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><div style="width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.06);"></div></div>
+                <div style="{{ c.flagStyle }}"></div>
+                <div style="{{ c.dotStyle }}"></div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="text-align:center;font-size:12px;color:#5f7768;letter-spacing:1px;margin-top:18px;">ROUND-ROBIN · {{ teamsNum }} TEAMS ACROSS {{ playersNum }} SQUADS</div>
+        </div>
+        </sc-if>
+
+        <!-- YOURS: reveal -->
+        <sc-if value="{{ phaseYours }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;padding:64px 0 24px;animation:screenIn .4s ease both;">
+          <div style="text-align:center;padding:0 26px;">
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;letter-spacing:5px;color:#16ff7a;">THE DRAW IS DONE</div>
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:62px;line-height:.85;color:#eafff0;text-transform:uppercase;text-shadow:0 0 50px rgba(0,230,118,.4);margin:2px 0 6px;">Your squad</div>
+            <div style="font-size:15px;color:#8fae9c;">You drew <span style="color:#eafff0;font-weight:600;">{{ myTeamCount }} nations</span>. Tap a card to flip it.</div>
+          </div>
+          <div style="display:flex;gap:14px;overflow-x:auto;padding:26px 26px 18px;scroll-snap-type:x mandatory;">
+            <sc-for list="{{ yourCards }}" as="card" hint-placeholder-count="5">
+              <div onClick="{{ card.onClick }}" style="{{ card.outer }}">
+                <div style="{{ card.inner }}">
+                  <div style="position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:linear-gradient(160deg,#0c2a1a,#05140c);border:1.5px solid rgba(0,230,118,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;">
+                    <div style="position:absolute;top:0;bottom:0;left:0;width:50%;background:linear-gradient(90deg,transparent,rgba(120,255,180,.25),transparent);animation:sweep 2.6s linear infinite;"></div>
+                    <div style="width:54px;height:54px;border-radius:50%;border:2px solid rgba(0,230,118,.5);display:flex;align-items:center;justify-content:center;"><span style="font-family:'Barlow Condensed';font-weight:800;font-size:22px;color:#16ff7a;">26</span></div>
+                    <div style="font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:3px;color:#7fbf98;margin-top:12px;">TAP</div>
+                  </div>
+                  <div style="{{ card.back }}">
+                    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 35%,rgba(0,0,0,.9));"></div>
+                    <div style="position:absolute;top:10px;left:10px;padding:3px 8px;border-radius:7px;background:#16ff7a;font-family:'Barlow Condensed';font-weight:800;font-size:11px;letter-spacing:1px;color:#022a14;">YOURS</div>
+                    <div style="position:absolute;left:12px;right:12px;bottom:12px;">
+                      <div style="font-family:'Barlow Condensed';font-weight:700;font-size:12px;letter-spacing:1px;color:#bfe9cd;">{{ card.group }}</div>
+                      <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;line-height:.95;color:#fff;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.6);">{{ card.name }}</div>
+                    </div>
+                  </div>
+                </div>
+                <sc-if value="{{ card.flipped }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;inset:0;border-radius:18px;pointer-events:none;box-shadow:0 0 0 2px #16ff7a,0 0 32px rgba(0,230,118,.75);animation:cardFlash .55s ease-out forwards;"></div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <div style="margin-top:auto;padding:8px 26px 0;">
+            <button onClick="{{ enterHome }}" style="width:100%;height:58px;border:none;border-radius:18px;background:linear-gradient(180deg,#1bff84,#00c95f);color:#022a14;font-family:'Barlow Condensed';font-weight:800;font-size:23px;letter-spacing:1.5px;cursor:pointer;box-shadow:0 12px 30px rgba(0,230,118,.42);">ENTER THE TOURNAMENT →</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- DONE: summary -->
+        <sc-if value="{{ phaseDone }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;overflow-y:auto;padding:62px 22px 26px;animation:screenIn .4s ease both;">
+          <div style="font-family:'Barlow Condensed';font-weight:700;font-size:15px;letter-spacing:4px;color:#7fbf98;">DRAW COMPLETE</div>
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:42px;line-height:.9;color:#eafff0;text-transform:uppercase;margin:2px 0 18px;">Your {{ myTeamCount }} nations</div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+            <div style="border-radius:18px;padding:16px;background:linear-gradient(160deg,rgba(0,230,118,.16),rgba(6,22,14,.7));border:1px solid rgba(0,230,118,.2);">
+              <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#9fc8af;">STARTING RANK</div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:46px;line-height:.9;color:#16ff7a;">{{ myRank }} <span style="font-size:20px;color:#7fbf98;">/ {{ playersNum }}</span></div>
+            </div>
+            <div style="border-radius:18px;padding:16px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(6,22,14,.7));border:1px solid rgba(255,255,255,.1);">
+              <div style="font-size:11px;font-weight:600;letter-spacing:1px;color:#8fae9c;">TEAMS ALIVE</div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:46px;line-height:.9;color:#eafff0;">{{ aliveCount }} <span style="font-size:20px;color:#7fbf98;">/ {{ myTeamCount }}</span></div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <sc-for list="{{ yourRows }}" as="r" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:13px;padding:11px 13px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);">
+                <div style="{{ r.flagThumb }}"></div>
+                <div style="flex:1;">
+                  <div style="font-family:'Barlow Condensed';font-weight:700;font-size:21px;line-height:1;color:#eafff0;text-transform:uppercase;">{{ r.name }}</div>
+                  <div style="font-size:12px;color:#7fbf98;letter-spacing:.5px;">{{ r.code }} · {{ r.group }}</div>
+                </div>
+                <span style="padding:5px 10px;border-radius:8px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.25);font-family:'Barlow Condensed';font-weight:700;font-size:12px;letter-spacing:1px;color:#16ff7a;">GROUP STAGE</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <button onClick="{{ replay }}" style="margin-top:22px;width:100%;height:54px;border:1px solid rgba(255,255,255,.14);border-radius:16px;background:rgba(255,255,255,.05);color:#eafff0;font-family:'Barlow Condensed';font-weight:700;font-size:20px;letter-spacing:1px;cursor:pointer;">↺ REPLAY THE FLOW</button>
+        </div>
+        </sc-if>
+
+      </div>
+      </sc-if>
+
+      <!-- ══════════ HOME / DASHBOARD ══════════ -->
+      <sc-if value="{{ isHome }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;animation:screenIn .45s ease both;">
+        <div style="flex:1;overflow-y:auto;padding:58px 20px 100px;">
+
+          <!-- header -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="{{ homeMonoStyle }}">{{ hInit }}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12.5px;color:#7fbf98;letter-spacing:.5px;">Welcome back</div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;line-height:.95;color:#eafff0;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ hName }}</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:#7fbf98;">RANK</div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;line-height:.9;color:#16ff7a;">{{ myRank }}<span style="font-size:15px;color:#7fbf98;">{{ myRankSuf }}</span></div>
+            </div>
+            <div onClick="{{ logout }}" title="Log out" style="flex:none;width:38px;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;">
+              <svg width="17" height="17" viewBox="0 0 24 24"><path d="M14 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2M9 12h11m0 0-3-3m3 3-3 3" fill="none" stroke="#9fc8af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+
+          <!-- hero score -->
+          <div style="position:relative;overflow:hidden;border-radius:22px;padding:22px;margin-bottom:22px;background:linear-gradient(160deg,rgba(0,230,118,.2),rgba(6,22,14,.85));border:1px solid rgba(0,230,118,.28);box-shadow:0 16px 40px rgba(0,0,0,.45);">
+            <div style="position:absolute;top:0;bottom:0;left:0;width:45%;background:linear-gradient(90deg,transparent,rgba(120,255,180,.14),transparent);animation:sweep 4s linear infinite;pointer-events:none;"></div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:1.6px;color:#9fc8af;">YOUR SCORE</div>
+            <div style="display:flex;align-items:flex-end;gap:10px;">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:78px;line-height:.82;color:#eafff0;text-shadow:0 0 36px rgba(0,230,118,.35);">{{ myScore }}</div>
+              <div style="padding:4px 9px;border-radius:8px;background:rgba(0,230,118,.18);border:1px solid rgba(0,230,118,.35);font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:.5px;color:#16ff7a;margin-bottom:14px;">{{ myMoveLabel }}</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:6px;">
+              <span style="width:8px;height:8px;border-radius:50%;background:#16ff7a;box-shadow:0 0 8px #16ff7a;"></span>
+              <span style="font-size:14px;color:#bfe9cd;"><span style="font-weight:700;color:#eafff0;">{{ aliveCount }} of {{ myTeamCount }} teams</span> still alive{{ topTeamSuffix }}</span>
+            </div>
+          </div>
+
+          <!-- your squad -->
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;letter-spacing:.5px;color:#eafff0;text-transform:uppercase;">Your squad</div>
+              <span style="padding:2px 8px;border-radius:6px;background:rgba(0,230,118,.14);border:1px solid rgba(0,230,118,.3);font-size:10px;font-weight:700;letter-spacing:1px;color:#16ff7a;">YOUR TEAMS</span>
+            </div>
+            <div style="font-size:12px;color:#7fbf98;letter-spacing:.5px;">{{ myTeamCount }} nations</div>
+          </div>
+          <div style="display:flex;gap:11px;overflow-x:auto;padding-bottom:6px;margin:0 -20px 24px;padding-left:20px;padding-right:20px;scroll-snap-type:x mandatory;">
+            <sc-for list="{{ homeSquad }}" as="t" hint-placeholder-count="5">
+              <div style="{{ t.cardStyle }}">
+                <div style="{{ t.flagStyle }}"><div style="{{ t.scrim }}"></div><div style="{{ t.stageBadge }}">{{ t.stage }}</div></div>
+                <div style="padding:9px 11px 11px;">
+                  <div style="font-family:'Barlow Condensed';font-weight:700;font-size:18px;line-height:1;color:#eafff0;text-transform:uppercase;">{{ t.nm }}</div>
+                  <div style="font-size:10.5px;letter-spacing:.5px;color:#7fbf98;margin:2px 0 9px;">{{ t.grp }} · {{ t.rec }}</div>
+                  <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+                    <span style="{{ t.ptsStyle }}">{{ t.pts }}</span>
+                    <span style="font-size:10px;color:#5f7768;letter-spacing:.5px;margin-bottom:3px;">PTS</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- your next matches -->
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;letter-spacing:.5px;color:#eafff0;text-transform:uppercase;margin-bottom:11px;">Your next matches</div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:24px;">
+            <sc-for list="{{ fixtures }}" as="f" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:15px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);">
+                <div style="{{ f.yourFlag }}"></div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;line-height:1;color:#eafff0;text-transform:uppercase;">{{ f.you }} <span style="color:#5f7768;font-size:13px;">vs</span> {{ f.opp }}</div>
+                  <div style="font-size:11.5px;color:#7fbf98;margin-top:2px;">{{ f.grp }} · {{ f.when }}</div>
+                </div>
+                <div style="{{ f.oppFlag }}"></div>
+              </div>
+            </sc-for>
+          </div>
+
+          <!-- 2026 football tracker (global — all teams, not just yours) -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px;">
+            <span style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;letter-spacing:.5px;color:#eafff0;text-transform:uppercase;">2026 football tracker</span>
+            <span style="padding:2px 8px;border-radius:6px;background:rgba(127,191,152,.12);border:1px solid rgba(127,191,152,.32);font-size:10px;font-weight:700;letter-spacing:1px;color:#9fd8b3;">ALL TEAMS</span>
+            <sc-if value="{{ hasLive }}" hint-placeholder-val="{{ false }}">
+            <span style="padding:2px 8px;border-radius:6px;background:rgba(255,77,109,.16);border:1px solid rgba(255,77,109,.4);font-size:10px;font-weight:700;letter-spacing:1px;color:#ff6b85;">● {{ liveLabel }}</span>
+            </sc-if>
+            <span style="margin-left:auto;font-size:11px;color:#5f7768;letter-spacing:.5px;">TAP A MATCH →</span>
+          </div>
+          <sc-if value="{{ hasTicker }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.07);">
+            <sc-for list="{{ ticker }}" as="e" hint-placeholder-count="4">
+              <div onClick="{{ e.onClick }}" style="{{ e.rowStyle }}">
+                <span style="{{ e.dot }}"></span>
+                <div style="flex:1;">
+                  <div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;line-height:1;color:#eafff0;">{{ e.txt }}</div>
+                  <div style="font-size:11.5px;color:#7fbf98;margin-top:2px;">{{ e.meta }}</div>
+                </div>
+                <svg width="13" height="13" viewBox="0 0 24 24" style="flex:none;opacity:.45;"><path d="M9 6l6 6-6 6" fill="none" stroke="#9fc8af" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+          <sc-if value="{{ emptyTicker }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:18px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.07);text-align:center;font-size:12.5px;color:#5f7768;letter-spacing:.3px;">No matches today — check back at kickoff.</div>
+          </sc-if>
+
+          <!-- latest news (Guardian + BBC Sport) -->
+          <sc-if value="{{ hasNews }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:8px;margin:22px 0 11px;">
+            <span style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;letter-spacing:.5px;color:#eafff0;text-transform:uppercase;">Latest</span>
+            <span style="margin-left:auto;font-size:11px;color:#5f7768;letter-spacing:.5px;">2026 FOOTBALL NEWS</span>
+          </div>
+          <div style="display:flex;flex-direction:column;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.07);">
+            <sc-for list="{{ latestNews }}" as="a" hint-placeholder-count="5">
+              <a href="{{ a.url }}" target="_blank" rel="noopener" style="{{ a.rowStyle }}">
+                <div style="flex:1;min-width:0;">
+                  <div style="font-family:'Barlow';font-weight:600;font-size:14px;line-height:1.25;color:#eafff0;">{{ a.title }}</div>
+                  <div style="font-size:11px;color:#7fbf98;margin-top:3px;">{{ a.meta }}</div>
+                </div>
+                <svg width="13" height="13" viewBox="0 0 24 24" style="flex:none;opacity:.45;"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="#9fc8af" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </a>
+            </sc-for>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:8px;font-size:10.5px;color:#5f7768;">
+            <a href="https://www.theguardian.com/" target="_blank" rel="noopener noreferrer" style="color:#7fbf98;text-decoration:underline;text-underline-offset:2px;">Powered by The Guardian</a>
+            <span>·</span>
+            <a href="https://www.bbc.co.uk/sport/football" target="_blank" rel="noopener noreferrer" style="color:#7fbf98;text-decoration:underline;text-underline-offset:2px;">BBC Sport</a>
+          </div>
+          </sc-if>
+
+        </div>
+
+        <!-- bottom tab bar -->
+        <div class="tabbar" style="position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:flex-start;padding:10px 14px 26px;background:linear-gradient(180deg,rgba(4,17,10,.4),rgba(3,11,7,.97) 55%);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.06);">
+          <sc-for list="{{ homeTabs }}" as="tb" hint-placeholder-count="5">
+            <div onClick="{{ tb.onClick }}" style="{{ tb.wrap }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" dangerouslySetInnerHTML="{{ tb.iconHtml }}"></svg>
+              <span style="{{ tb.labelStyle }}">{{ tb.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ THE POT ══════════ -->
+      <sc-if value="{{ isPot }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;animation:screenIn .45s ease both;">
+
+        <!-- sticky header -->
+        <div style="padding:58px 20px 12px;background:linear-gradient(180deg,#04110a 72%,rgba(4,17,10,0));position:relative;z-index:2;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:14px;">
+            <div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:34px;line-height:.9;color:#eafff0;text-transform:uppercase;letter-spacing:.5px;">The Pot</div>
+              <div style="font-size:12.5px;color:#7fbf98;letter-spacing:.5px;margin-top:2px;">{{ teamsNum }} nations · {{ playersNum }} squads</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:30px;line-height:.9;color:#16ff7a;">{{ potAlive }}</div>
+              <div style="font-size:10px;font-weight:600;letter-spacing:1px;color:#7fbf98;">ALIVE</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:9px;overflow-x:auto;padding-bottom:2px;margin:0 -20px;padding-left:20px;padding-right:20px;">
+            <sc-for list="{{ potFilters }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- scroll list -->
+        <div style="flex:1;overflow-y:auto;padding:6px 16px 100px;">
+          <sc-for list="{{ potSections }}" as="sec" hint-placeholder-count="12">
+            <div style="margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:9px;margin:6px 4px 8px;">
+                <span style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:2px;color:#16ff7a;">{{ sec.letter }}</span>
+                <span style="flex:1;height:1px;background:linear-gradient(90deg,rgba(0,230,118,.3),transparent);"></span>
+              </div>
+              <div style="border-radius:16px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06);padding:5px;display:flex;flex-direction:column;gap:2px;">
+                <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="4">
+                  <div style="{{ r.rowStyle }}">
+                    <span style="{{ r.rankStyle }}">{{ r.rank }}</span>
+                    <div style="{{ r.flagStyle }}"></div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-family:'Barlow Condensed';font-weight:700;font-size:17px;line-height:1;color:#eafff0;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</div>
+                      <div style="display:inline-flex;margin-top:4px;align-items:center;gap:5px;{{ r.chip }}">
+                        <span style="{{ r.sq }}">{{ r.ownerInit }}</span>
+                        <span style="{{ r.ownerTxt }}">{{ r.ownerName }}</span>
+                      </div>
+                    </div>
+                    <span style="{{ r.ptsStyle }}">{{ r.pts }}</span>
+                    <span style="font-size:9px;color:#5f7768;letter-spacing:.5px;flex:none;">PTS</span>
+                    <span style="{{ r.aliveDot }}"></span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- bottom tab bar -->
+        <div class="tabbar" style="position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:flex-start;padding:10px 14px 26px;background:linear-gradient(180deg,rgba(4,17,10,.4),rgba(3,11,7,.97) 55%);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.06);">
+          <sc-for list="{{ homeTabs }}" as="tb" hint-placeholder-count="5">
+            <div onClick="{{ tb.onClick }}" style="{{ tb.wrap }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" dangerouslySetInnerHTML="{{ tb.iconHtml }}"></svg>
+              <span style="{{ tb.labelStyle }}">{{ tb.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ LEADERBOARD ══════════ -->
+      <sc-if value="{{ isBoard }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;animation:screenIn .45s ease both;">
+        <div style="padding:58px 20px 14px;background:linear-gradient(180deg,#04110a 75%,rgba(4,17,10,0));position:relative;z-index:2;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;">
+            <div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:34px;line-height:.9;color:#eafff0;text-transform:uppercase;letter-spacing:.5px;">Leaderboard</div>
+              <div style="font-size:12.5px;color:#7fbf98;letter-spacing:.5px;margin-top:2px;">{{ playersNum }} players · tap to expand</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:7px;margin-top:12px;padding:9px 13px;border-radius:12px;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);">
+            <span style="font-family:'Barlow Condensed';font-weight:700;font-size:13px;letter-spacing:.5px;color:#16ff7a;">▲ BIGGEST MOVER</span>
+            <span style="font-size:13px;color:#bfe9cd;">{{ topMoverName }} is climbing fast</span>
+          </div>
+        </div>
+
+        <div style="flex:1;overflow-y:auto;padding:6px 16px 100px;display:flex;flex-direction:column;gap:10px;">
+          <sc-for list="{{ boardRows }}" as="r" hint-placeholder-count="11">
+            <div style="{{ r.rowStyle }}">
+              <div onClick="{{ r.onClick }}" style="{{ r.head }}">
+                <span style="{{ r.rankBox }}">{{ r.rank }}</span>
+                <div style="{{ r.mono }}">{{ r.initials }}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="{{ r.nameStyle }}">{{ r.nm }}</div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-top:3px;">
+                    <span style="font-size:11.5px;color:#7fbf98;">{{ r.sub }}</span>
+                    <span style="{{ r.moveStyle }}">{{ r.moveLabel }}</span>
+                  </div>
+                </div>
+                <span style="{{ r.scoreStyle }}">{{ r.score }}</span>
+                <svg width="15" height="15" viewBox="0 0 24 24" style="{{ r.chev }}"><path d="M6 9l6 6 6-6" fill="none" stroke="#9fc8af" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div style="{{ r.panelStyle }}">
+                <div style="display:flex;flex-wrap:wrap;gap:7px;padding:12px 14px 14px;">
+                  <sc-for list="{{ r.teamChips }}" as="c" hint-placeholder-count="4">
+                    <div style="{{ c.chip }}"><div style="{{ c.fl }}"></div><span style="{{ c.tx }}">{{ c.name }}</span></div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div class="tabbar" style="position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:flex-start;padding:10px 14px 26px;background:linear-gradient(180deg,rgba(4,17,10,.4),rgba(3,11,7,.97) 55%);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.06);">
+          <sc-for list="{{ homeTabs }}" as="tb" hint-placeholder-count="5">
+            <div onClick="{{ tb.onClick }}" style="{{ tb.wrap }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" dangerouslySetInnerHTML="{{ tb.iconHtml }}"></svg>
+              <span style="{{ tb.labelStyle }}">{{ tb.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ MATCH CENTRE ══════════ -->
+      <sc-if value="{{ isMatch }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;animation:screenIn .45s ease both;">
+        <div style="padding:58px 20px 12px;">
+          <div style="font-family:'Barlow Condensed';font-weight:800;font-size:34px;line-height:.9;color:#eafff0;text-transform:uppercase;letter-spacing:.5px;">Match Centre</div>
+          <div style="font-size:12.5px;color:#7fbf98;letter-spacing:.5px;margin:2px 0 14px;">Group stage live · knockouts projected</div>
+          <div style="display:flex;gap:6px;padding:5px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);">
+            <sc-for list="{{ mcViewTabs }}" as="v" hint-placeholder-count="2">
+              <button onClick="{{ v.onClick }}" style="{{ v.style }}">{{ v.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- RESULTS feed -->
+        <sc-if value="{{ mcIsResults }}" hint-placeholder-val="{{ false }}">
+        <div style="flex:1;overflow-y:auto;padding:4px 16px 100px;">
+          <div style="display:flex;gap:9px;overflow-x:auto;padding:0 0 12px;">
+            <sc-for list="{{ mcFilters }}" as="f" hint-placeholder-count="3">
+              <button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <sc-for list="{{ mcRows }}" as="r" hint-placeholder-count="8">
+              <div style="{{ r.rowStyle }}">
+                <div style="flex:1;display:flex;align-items:center;gap:8px;min-width:0;">
+                  <div style="{{ r.hFlag }}"></div>
+                  <span style="{{ r.hNameStyle }}">{{ r.hName }}</span>
+                </div>
+                <span style="{{ r.scoreStyle }}">{{ r.score }}</span>
+                <div style="flex:1;display:flex;align-items:center;gap:8px;justify-content:flex-end;min-width:0;">
+                  <span style="{{ r.aNameStyle }}">{{ r.aName }}</span>
+                  <div style="{{ r.aFlag }}"></div>
+                </div>
+                <div style="width:54px;display:flex;justify-content:flex-end;flex:none;">
+                  <span style="{{ r.statusBadge.style }}">
+                    <sc-if value="{{ r.live2 }}" hint-placeholder-val="{{ false }}"><span style="width:6px;height:6px;border-radius:50%;background:#ff4d6d;animation:livedot 1.3s ease-in-out infinite;"></span></sc-if>
+                    {{ r.statusBadge.txt }}
+                  </span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- BRACKET tree -->
+        <sc-if value="{{ mcIsBracket }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;overflow:auto;padding:8px 16px 100px;">
+          <div style="display:flex;gap:18px;align-items:stretch;width:max-content;">
+            <sc-for list="{{ bracketCols }}" as="col" hint-placeholder-count="5">
+              <div style="{{ col.colStyle }}">
+                <div style="position:sticky;top:0;display:flex;align-items:center;gap:6px;margin-bottom:2px;z-index:1;">
+                  <span style="font-family:'Barlow Condensed';font-weight:800;font-size:13px;letter-spacing:2px;color:#16ff7a;">{{ col.label }}</span>
+                  <span style="font-size:10px;color:#5f7768;">{{ col.sub }}</span>
+                </div>
+                <sc-for list="{{ col.matches }}" as="m" hint-placeholder-count="4">
+                  <div style="{{ m.cardStyle }}">
+                    <div style="{{ m.home.style }}"><div style="{{ m.home.flag }}"></div><span style="{{ m.home.txt }}">{{ m.home.code }}</span></div>
+                    <div style="{{ m.divider }}"></div>
+                    <div style="{{ m.away.style }}"><div style="{{ m.away.flag }}"></div><span style="{{ m.away.txt }}">{{ m.away.code }}</span></div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <div class="tabbar" style="position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:flex-start;padding:10px 14px 26px;background:linear-gradient(180deg,rgba(4,17,10,.4),rgba(3,11,7,.97) 55%);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.06);">
+          <sc-for list="{{ homeTabs }}" as="tb" hint-placeholder-count="5">
+            <div onClick="{{ tb.onClick }}" style="{{ tb.wrap }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" dangerouslySetInnerHTML="{{ tb.iconHtml }}"></svg>
+              <span style="{{ tb.labelStyle }}">{{ tb.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ ADMIN ══════════ -->
+      <sc-if value="{{ isAdminScreen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;animation:screenIn .45s ease both;">
+        <div style="flex:1;overflow-y:auto;padding:58px 18px 100px;">
+
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:34px;line-height:.9;color:#eafff0;text-transform:uppercase;letter-spacing:.5px;">Admin</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.32);max-width:62%;">
+              <svg width="12" height="12" viewBox="0 0 24 24" style="flex:none;"><circle cx="12" cy="8" r="3.4" fill="none" stroke="#16ff7a" stroke-width="2"/><path d="M5.5 20c0-3.3 2.9-5.5 6.5-5.5s6.5 2.2 6.5 5.5" fill="none" stroke="#16ff7a" stroke-width="2" stroke-linecap="round"/></svg>
+              <span style="font-size:10px;font-weight:700;letter-spacing:.4px;color:#16ff7a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ adminEmail }}</span>
+            </div>
+          </div>
+          <div style="font-size:12.5px;color:#7fbf98;letter-spacing:.5px;margin-bottom:20px;">Magic-link verified · admin</div>
+
+          <!-- status machine -->
+          <div style="border-radius:18px;padding:16px;margin-bottom:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#7fbf98;margin-bottom:14px;">SWEEPSTAKE STATUS</div>
+            <div style="display:flex;align-items:flex-start;margin-bottom:16px;">
+              <sc-for list="{{ statusSteps }}" as="st" hint-placeholder-count="5">
+                <div style="display:flex;flex-direction:column;align-items:center;flex:none;width:34px;">
+                  <div style="{{ st.dot }}">{{ st.mark }}</div>
+                  <div style="{{ st.labelStyle }}">{{ st.label }}</div>
+                </div>
+                <sc-if value="{{ st.showConnector }}" hint-placeholder-val="{{ true }}"><div style="{{ st.connector }}" ></div></sc-if>
+              </sc-for>
+            </div>
+            <button onClick="{{ advanceAction }}" style="width:100%;height:46px;border:none;border-radius:13px;background:linear-gradient(180deg,#1bff84,#00c95f);color:#022a14;font-family:'Barlow Condensed';font-weight:800;font-size:17px;letter-spacing:.8px;cursor:pointer;">{{ advanceLabel }}</button>
+          </div>
+
+          <!-- draw + join code -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+            <div style="border-radius:18px;padding:15px;background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:13px;letter-spacing:1px;color:#7fbf98;">THE DRAW</div>
+              <div style="display:flex;align-items:center;gap:6px;margin:8px 0 4px;">
+                <span style="width:18px;height:18px;border-radius:6px;background:#16ff7a;display:flex;align-items:center;justify-content:center;font-size:11px;color:#022a14;font-weight:800;">{{ drawMark }}</span>
+                <span style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;color:#eafff0;">{{ drawStateLabel }}</span>
+              </div>
+              <div style="font-size:11px;color:#5f7768;font-family:'Barlow';">{{ drawStateNote }}</div>
+            </div>
+            <div style="border-radius:18px;padding:15px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:13px;letter-spacing:1px;color:#7fbf98;">JOIN CODE</div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:26px;letter-spacing:3px;color:#eafff0;margin:6px 0 8px;">{{ adminCode }}</div>
+              <button onClick="{{ regenCode }}" style="width:100%;height:30px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:rgba(255,255,255,.04);color:#9fc8af;font-family:'Barlow Condensed';font-weight:700;font-size:12px;letter-spacing:.5px;cursor:pointer;">↻ REGENERATE</button>
+            </div>
+          </div>
+
+          <!-- feed health -->
+          <div style="border-radius:18px;padding:16px;margin-bottom:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#7fbf98;">FEED HEALTH</div>
+              <sc-if value="{{ feedOk }}" hint-placeholder-val="{{ true }}">
+                <span style="display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(0,230,118,.14);border:1px solid rgba(0,230,118,.3);font-family:'Barlow Condensed';font-weight:700;font-size:12px;letter-spacing:1px;color:#16ff7a;"><span style="width:7px;height:7px;border-radius:50%;background:#16ff7a;box-shadow:0 0 8px #16ff7a;"></span>HEALTHY</span>
+              </sc-if>
+            </div>
+            <div style="display:flex;gap:20px;margin-bottom:14px;">
+              <div><div style="font-size:11px;color:#5f7768;letter-spacing:.5px;">PROVIDER</div><div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;color:#eafff0;">football data</div></div>
+              <div><div style="font-size:11px;color:#5f7768;letter-spacing:.5px;">LAST SYNC</div><div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;color:#eafff0;">{{ lastSync }}</div></div>
+              <div><div style="font-size:11px;color:#5f7768;letter-spacing:.5px;">FAILS</div><div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;color:#16ff7a;">{{ feedFails }}</div></div>
+            </div>
+            <button onClick="{{ forceRefresh }}" style="width:100%;height:42px;border:1px solid rgba(0,230,118,.3);border-radius:12px;background:rgba(0,230,118,.08);color:#16ff7a;font-family:'Barlow Condensed';font-weight:700;font-size:15px;letter-spacing:.8px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">
+              <sc-if value="{{ syncing }}" hint-placeholder-val="{{ false }}"><span style="width:14px;height:14px;border:2px solid rgba(0,230,118,.35);border-top-color:#16ff7a;border-radius:50%;animation:spin 1s linear infinite;"></span></sc-if>
+              <span>{{ syncLabel }}</span>
+            </button>
+          </div>
+
+          <!-- invite a player -->
+          <div style="border-radius:18px;padding:16px;margin-bottom:14px;background:linear-gradient(160deg,rgba(0,230,118,.08),rgba(255,255,255,.025));border:1px solid rgba(0,230,118,.2);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <svg width="17" height="14" viewBox="0 0 30 24"><rect x="1" y="2" width="28" height="20" rx="4" fill="none" stroke="#16ff7a" stroke-width="2"/><path d="M2 4l13 9 13-9" fill="none" stroke="#16ff7a" stroke-width="2" stroke-linecap="round"/></svg>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#16ff7a;">INVITE A PLAYER</div>
+            </div>
+            <div style="font-size:12px;color:#7fbf98;margin-bottom:13px;line-height:1.35;">Sends a one-time sign-in link to their inbox. <span style="color:#bfe9cd;">The invite is what lets them in</span> — they can request a fresh link to that email anytime.</div>
+            <div style="display:flex;gap:9px;margin-bottom:11px;">
+              <input value="{{ inviteEmail }}" onInput="{{ onInviteEmail }}" type="email" inputmode="email" placeholder="player@example.com" style="flex:1;min-width:0;height:48px;border-radius:13px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.3);color:#eafff0;font-family:'Barlow';font-size:15px;padding:0 14px;outline:none;" />
+            </div>
+            <button onClick="{{ sendInvite }}" style="{{ inviteBtnStyle }}">
+              <sc-if value="{{ inviteSending }}" hint-placeholder-val="{{ false }}"><span style="width:15px;height:15px;border:2px solid rgba(2,42,20,.4);border-top-color:#022a14;border-radius:50%;animation:spin 1s linear infinite;"></span></sc-if>
+              <span>{{ inviteBtnLabel }}</span>
+            </button>
+            <sc-if value="{{ inviteSent }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:7px;margin-top:11px;padding:9px 12px;border-radius:11px;background:rgba(0,230,118,.12);border:1px solid rgba(0,230,118,.28);animation:rise .3s ease both;">
+                <span style="width:18px;height:18px;border-radius:6px;background:#16ff7a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#022a14;flex:none;">✓</span>
+                <span style="font-size:12.5px;color:#bfe9cd;">Invite delivered — their sign-in link is on its way.</span>
+              </div>
+            </sc-if>
+            <sc-if value="{{ hasSentInvites }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:13px;display:flex;flex-direction:column;gap:6px;">
+                <sc-for list="{{ sentInvites }}" as="iv" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);">
+                    <svg width="13" height="13" viewBox="0 0 24 24" style="flex:none;"><path d="M5 12l5 5 9-11" fill="none" stroke="#16ff7a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span style="flex:1;min-width:0;font-family:'Barlow';font-size:13px;color:#cfe9d8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ iv.email }}</span>
+                    <span style="font-size:10.5px;color:#5f7768;flex:none;">{{ iv.ago }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- players -->
+          <div style="border-radius:18px;padding:16px;margin-bottom:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#7fbf98;margin-bottom:12px;">PLAYERS · {{ playersNum }}</div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <sc-for list="{{ adminPlayers }}" as="p" hint-placeholder-count="11">
+                <div style="{{ p.rowStyle }}">
+                  <div style="{{ p.mono }}">{{ p.initials }}</div>
+                  <div style="{{ p.nameStyle }}">{{ p.name }}</div>
+                  <span style="font-size:11px;color:#5f7768;flex:none;">{{ p.teamCount }}</span>
+                  <button onClick="{{ p.onRemove }}" style="{{ p.removeStyle }}">{{ p.removeLabel }}</button>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- scoring config -->
+          <div style="border-radius:18px;padding:16px;margin-bottom:14px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#7fbf98;margin-bottom:12px;">SCORING CONFIG</div>
+            <div style="display:flex;flex-direction:column;gap:1px;border-radius:11px;overflow:hidden;">
+              <sc-for list="{{ scoringRules }}" as="r" hint-placeholder-count="7">
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:rgba(0,0,0,.18);">
+                  <span style="font-size:13.5px;color:#bfe9cd;font-family:'Barlow';">{{ r.k }}</span>
+                  <span style="font-family:'Barlow Condensed';font-weight:800;font-size:16px;color:#16ff7a;">{{ r.v }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- audit log -->
+          <div style="border-radius:18px;padding:16px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#7fbf98;margin-bottom:12px;">AUDIT LOG</div>
+            <div style="display:flex;flex-direction:column;gap:0;">
+              <sc-for list="{{ auditRows }}" as="a" hint-placeholder-count="4">
+                <div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+                  <span style="width:6px;height:6px;border-radius:50%;background:#3f6b53;flex:none;margin-top:6px;"></span>
+                  <div style="flex:1;">
+                    <div style="font-family:'Barlow';font-weight:500;font-size:13.5px;color:#cfe9d8;line-height:1.2;">{{ a.action }}</div>
+                    <div style="font-size:11px;color:#5f7768;margin-top:1px;">{{ a.meta }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- session -->
+          <button onClick="{{ logout }}" style="margin-top:8px;width:100%;height:50px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:rgba(255,255,255,.05);color:#cfe9d8;font-family:'Barlow Condensed';font-weight:800;font-size:17px;letter-spacing:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">↩ LOG OUT</button>
+
+          <!-- danger zone (testing utility) -->
+          <div style="margin-top:24px;border-radius:18px;padding:18px;background:rgba(255,77,109,.06);border:1px solid rgba(255,77,109,.22);">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:15px;letter-spacing:1.5px;color:#ff6b85;margin-bottom:6px;">DANGER ZONE</div>
+            <div style="font-size:12.5px;color:#8fae9c;margin-bottom:14px;line-height:1.35;">Wipes the draw and every other player, and reopens registration. You stay signed in. Can't be undone.</div>
+            <button onClick="{{ resetGame }}" style="width:100%;height:52px;border:1px solid rgba(255,77,109,.45);border-radius:14px;background:rgba(255,77,109,.12);color:#ff6b85;font-family:'Barlow Condensed';font-weight:800;font-size:18px;letter-spacing:1px;cursor:pointer;">⚠ WIPE &amp; RESET GAME</button>
+          </div>
+
+        </div>
+
+        <!-- match edit modal -->
+
+        <div class="tabbar" style="position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;align-items:flex-start;padding:10px 14px 26px;background:linear-gradient(180deg,rgba(4,17,10,.4),rgba(3,11,7,.97) 55%);backdrop-filter:blur(14px);border-top:1px solid rgba(255,255,255,.06);">
+          <sc-for list="{{ homeTabs }}" as="tb" hint-placeholder-count="5">
+            <div onClick="{{ tb.onClick }}" style="{{ tb.wrap }}">
+              <svg width="23" height="23" viewBox="0 0 24 24" dangerouslySetInnerHTML="{{ tb.iconHtml }}"></svg>
+              <span style="{{ tb.labelStyle }}">{{ tb.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ══════════ MATCH NEWS / FEED ══════════ -->
+      <sc-if value="{{ isNews }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;animation:screenIn .4s ease both;">
+        <div style="flex:1;overflow-y:auto;padding:54px 0 30px;">
+
+          <!-- top bar -->
+          <div style="display:flex;align-items:center;gap:10px;padding:0 18px 12px;">
+            <div onClick="{{ backFromNews }}" style="width:38px;height:38px;border-radius:12px;flex:none;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6" fill="none" stroke="#eafff0" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div style="font-family:'Barlow Condensed';font-weight:700;font-size:14px;letter-spacing:3px;color:#7fbf98;">MATCH FEED</div>
+          </div>
+
+          <!-- scoreboard hero -->
+          <div style="margin:0 16px 18px;border-radius:22px;padding:22px 18px;background:radial-gradient(120% 90% at 50% 0%,rgba(0,230,118,.16),rgba(6,22,14,.9));border:1px solid rgba(0,230,118,.2);box-shadow:0 14px 38px rgba(0,0,0,.45);">
+            <div style="display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+              <span style="{{ newsData.statusStyle }}">
+                <sc-if value="{{ newsData.live }}" hint-placeholder-val="{{ false }}"><span style="width:7px;height:7px;border-radius:50%;background:#ff4d6d;animation:livedot 1.3s ease-in-out infinite;"></span></sc-if>
+                {{ newsData.statusText }}
+              </span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:16px;">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <div style="{{ newsData.hFlag }}"></div>
+                <div style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;color:#eafff0;text-transform:uppercase;">{{ newsData.hCode }}</div>
+                <sc-if value="{{ newsData.hMine }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px;border-radius:6px;background:#16ff7a;font-family:'Barlow Condensed';font-weight:800;font-size:9px;letter-spacing:1px;color:#022a14;">YOURS</span></sc-if>
+              </div>
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:54px;line-height:.85;color:#eafff0;letter-spacing:1px;flex:none;text-shadow:0 0 30px rgba(0,230,118,.3);">{{ newsData.score }}</div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;">
+                <div style="{{ newsData.aFlag }}"></div>
+                <div style="font-family:'Barlow Condensed';font-weight:800;font-size:20px;color:#eafff0;text-transform:uppercase;">{{ newsData.aCode }}</div>
+                <sc-if value="{{ newsData.aMine }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 7px;border-radius:6px;background:#16ff7a;font-family:'Barlow Condensed';font-weight:800;font-size:9px;letter-spacing:1px;color:#022a14;">YOURS</span></sc-if>
+              </div>
+            </div>
+            <div style="text-align:center;font-size:12px;color:#7fbf98;letter-spacing:.5px;margin-top:14px;">{{ newsData.meta }}</div>
+          </div>
+
+          <!-- headlines -->
+          <div style="padding:0 16px;display:flex;flex-direction:column;gap:10px;margin-bottom:22px;">
+            <sc-for list="{{ newsData.headlines }}" as="h" hint-placeholder-count="2">
+              <a href="{{ h.url }}" target="_blank" rel="noopener" style="{{ h.cardStyle }}">
+                <span style="{{ h.tagStyle }}">{{ h.tag }}</span>
+                <div style="font-family:'Barlow Condensed';font-weight:700;font-size:20px;line-height:1.08;color:#eafff0;text-wrap:pretty;">{{ h.title }}</div>
+                <div style="font-size:11px;color:#5f7768;letter-spacing:.5px;margin-top:7px;">{{ h.src }}</div>
+              </a>
+            </sc-for>
+            <div style="display:flex;align-items:center;justify-content:flex-end;gap:7px;font-size:10.5px;color:#5f7768;">
+              <a href="https://www.theguardian.com/" target="_blank" rel="noopener noreferrer" style="color:#7fbf98;text-decoration:underline;text-underline-offset:2px;">Powered by The Guardian</a>
+              <span>·</span>
+              <a href="https://www.bbc.co.uk/sport/football" target="_blank" rel="noopener noreferrer" style="color:#7fbf98;text-decoration:underline;text-underline-offset:2px;">BBC Sport</a>
+            </div>
+          </div>
+
+          <!-- timeline -->
+          <div style="padding:0 18px;">
+            <div style="font-family:'Barlow Condensed';font-weight:800;font-size:16px;letter-spacing:2px;color:#7fbf98;margin-bottom:14px;">TIMELINE</div>
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <sc-for list="{{ newsData.events }}" as="ev" hint-placeholder-count="6">
+                <div style="display:flex;align-items:flex-start;gap:11px;">
+                  <span style="{{ ev.minStyle }}">{{ ev.min }}</span>
+                  <div style="{{ ev.iconWrap }}">
+                    <div style="{{ ev.iconDot }}"></div>
+                    <div style="{{ ev.cardRect }}"></div>
+                    <div style="{{ ev.liveDot }}"></div>
+                    <div style="{{ ev.whistleDot }}"></div>
+                    <div style="{{ ev.connector }}"></div>
+                  </div>
+                  <div style="flex:1;padding-bottom:2px;">
+                    <div style="display:flex;align-items:center;gap:7px;">
+                      <div style="{{ ev.titleStyle }}">{{ ev.title }}</div>
+                      <div style="{{ ev.sideFlagStyle }}"></div>
+                    </div>
+                    <div style="font-size:12.5px;color:#8fae9c;margin-top:2px;line-height:1.3;">{{ ev.sub }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+
+          <!-- commentary -->
+          <div style="padding:0 18px;margin-top:26px;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+              <div style="font-family:'Barlow Condensed';font-weight:800;font-size:16px;letter-spacing:2px;color:#7fbf98;">COMMENTARY</div>
+              <sc-if value="{{ newsData.isLiveMatch }}" hint-placeholder-val="{{ false }}">
+                <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:6px;background:rgba(255,77,109,.16);border:1px solid rgba(255,77,109,.4);font-family:'Barlow Condensed';font-weight:700;font-size:10px;letter-spacing:1px;color:#ff6b85;">
+                  <span style="width:6px;height:6px;border-radius:50%;background:#ff4d6d;animation:livedot 1.3s ease-in-out infinite;"></span>LIVE
+                </span>
+              </sc-if>
+              <a href="https://www.theguardian.com/" target="_blank" rel="noopener noreferrer" style="margin-left:auto;font-size:10.5px;color:#7fbf98;text-decoration:underline;text-underline-offset:2px;">Powered by The Guardian</a>
+            </div>
+            <sc-if value="{{ newsData.hasCommentary }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <sc-for list="{{ newsData.commentary }}" as="c" hint-placeholder-count="6">
+                  <div style="{{ c.rowStyle }}">
+                    <div style="{{ c.minStyle }}">{{ c.min }}</div>
+                    <div style="{{ c.titleStyle }}">{{ c.title }}</div>
+                    <div style="{{ c.bodyStyle }}">{{ c.body }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ newsData.noCommentary }}" hint-placeholder-val="{{ false }}">
+              <div style="border-radius:14px;padding:22px 16px;text-align:center;background:rgba(255,255,255,.025);border:1px dashed rgba(255,255,255,.1);">
+                <div style="font-size:13px;color:#7fbf98;line-height:1.4;">{{ newsData.emptyText }}</div>
+              </div>
+            </sc-if>
+          </div>
+
+        </div>
+      </div>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- reviewer jump bar -->
+  <div style="display:flex;align-items:center;gap:8px;font-family:'Barlow';">
+    <span style="font-size:12px;color:#5f7768;letter-spacing:.5px;margin-right:2px;">JUMP TO</span>
+    <sc-for list="{{ navTabs }}" as="t" hint-placeholder-count="4">
+      <button onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</button>
+    </sc-for>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:480,&quot;height&quot;:960},&quot;sweepName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;The Sweep&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;defaultRole&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Admin&quot;,&quot;Player&quot;],&quot;default&quot;:&quot;Admin&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;confetti&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;sound&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const mono = ['#00e676','#ff4d6d','#3b8cff','#ffb020','#b46bff','#19d3da','#ff7a3b','#a3e635'];
+    const G = 'ABCDEFGHIJKL';
+    const gf = (c, d) => {
+      const a = d === 'v' ? '90deg' : '180deg';
+      if (c.length === 3) return `linear-gradient(${a},${c[0]} 0 33.34%,${c[1]} 33.34% 66.67%,${c[2]} 66.67% 100%)`;
+      return `linear-gradient(${a},${c[0]} 0 50%,${c[1]} 50% 100%)`;
+    };
+    const raw = [
+      ['BRA','Brazil',['#009b3a','#ffdf00'],'v'],['MEX','Mexico',['#006847','#ffffff','#ce1126'],'v'],['CAN','Canada',['#ff0000','#ffffff','#ff0000'],'v'],['KSA','Saudi Arabia',['#006c35','#ffffff'],'h'],
+      ['USA','USA',['#3c3b6e','#ffffff','#b22234'],'v'],['NED','Netherlands',['#ae1c28','#ffffff','#21468b'],'h'],['WAL','Wales',['#ffffff','#00ad1d'],'h'],['QAT','Qatar',['#8a1538','#ffffff'],'v'],
+      ['ENG','England',['#ffffff','#cf142b'],'v'],['ESP','Spain',['#aa151b','#f1bf00','#aa151b'],'h'],['GER','Germany',['#000000','#dd0000','#ffce00'],'h'],['FRA','France',['#0055a4','#ffffff','#ef4135'],'v'],
+      ['POR','Portugal',['#006600','#ff0000'],'v'],['BEL','Belgium',['#000000','#fae042','#ed2939'],'v'],['CRO','Croatia',['#ff0000','#ffffff','#171796'],'h'],['URU','Uruguay',['#5b92e5','#ffffff'],'h'],
+      ['ITA','Italy',['#009246','#ffffff','#ce2b37'],'v'],['COL','Colombia',['#fcd116','#003893','#ce1126'],'h'],['SUI','Switzerland',['#d52b1e','#ffffff'],'h'],['SEN','Senegal',['#00853f','#fdef42','#e31b23'],'v'],
+      ['DEN','Denmark',['#c60c30','#ffffff'],'h'],['KOR','South Korea',['#ffffff','#cd2e3a'],'h'],['ARG','Argentina',['#75aadb','#ffffff','#75aadb'],'h'],['NGA','Nigeria',['#008751','#ffffff','#008751'],'v'],
+      ['AUS','Australia',['#00008b','#ffffff'],'h'],['GHA','Ghana',['#ce1126','#fcd116','#006b3f'],'h'],['SRB','Serbia',['#c6363c','#0c4076','#ffffff'],'h'],['ECU','Ecuador',['#ffdd00','#034ea2','#ed1c24'],'h'],
+      ['POL','Poland',['#ffffff','#dc143c'],'h'],['CMR','Cameroon',['#007a5e','#ce1126','#fcd116'],'v'],['AUT','Austria',['#ed2939','#ffffff','#ed2939'],'h'],['PER','Peru',['#d91023','#ffffff','#d91023'],'v'],
+      ['CHI','Chile',['#ffffff','#0039a6','#d52b1e'],'h'],['JPN','Japan',['#ffffff','#bc002d'],'h'],['CIV','Côte d\u2019Ivoire',['#f77f00','#ffffff','#009e60'],'v'],['SCO','Scotland',['#0065bf','#ffffff'],'h'],
+      ['TUN','Tunisia',['#e70013','#ffffff'],'h'],['SWE','Sweden',['#006aa7','#fecc00'],'h'],['NOR','Norway',['#ba0c2f','#ffffff','#00205b'],'v'],['GRE','Greece',['#0d5eaf','#ffffff'],'h'],
+      ['EGY','Egypt',['#ce1126','#ffffff','#000000'],'h'],['CRC','Costa Rica',['#002b7f','#ffffff','#ce1126'],'h'],['ALG','Algeria',['#006233','#ffffff'],'v'],['PAN','Panama',['#005293','#ffffff','#d21034'],'h'],
+      ['MAR','Morocco',['#c1272d','#006233'],'h'],['TUR','Türkiye',['#e30a17','#ffffff'],'v'],['UKR','Ukraine',['#0057b7','#ffd700'],'h'],['PAR','Paraguay',['#d52b1e','#ffffff','#0038a8'],'h'],
+    ];
+    this.teams = raw.map((r, i) => ({ code: r[0], name: r[1], group: G[Math.floor(i / 4)], flag: gf(r[2], r[3]), owner: i % 11, idx: i }));
+    const names = ['You','Leo','Maya','Theo','Jonah','Ava','Finn','Zara','Kai','Noor','Ezra'];
+    this.players = names.map((n, i) => ({ name: n, color: mono[i % mono.length], initials: i === 0 ? 'ME' : n.slice(0, 2).toUpperCase(), you: i === 0 }));
+    this.monoColors = mono;
+    this.yourTeams = this.teams.filter(t => t.owner === 0);
+    // Zeroed standings for the seeded teams so the first render (before /api/state
+    // loads, or if it fails) never dereferences a missing entry. applyServer overwrites.
+    this.standings = {};
+    this.teams.forEach((t, i) => { this.standings[i] = { pts: 0, w: 0, d: 0, l: 0, gd: 0, gf: 0, alive: true, rank: null }; });
+    this.matchNews = {};
+    // Fixtures + match news are rebuilt from /api/state by applyServer.
+    this.fixtures = [];
+    this.state = { screen: 'landing', joinCode: '', email: '', linkSent: false, name: '', mono: 0, isAdmin: false, drawPhase: 'pre', dealt: 0, revealed: 0, playersNum: 0, teamsNum: 0, flipped: {}, torn: false, potFilter: 'all', openPlayer: null, mcView: 'bracket', mcFilter: 'all',
+      adminStatus: 'registration_open', adminCode: '', syncing: false, lastSync: '—', feedFails: 0, removed: {}, matchEdit: null, mEditHs: 1, mEditAs: 1, mEditStatus: 'live',
+      inviteEmail: '', inviteState: 'idle', invitesSent: [],
+      audit: [] };
+    this.canvasRef = (el) => { this.canvas = el; };
+  }
+
+  clearTimers() { [this._deal, this._rev, this._cnt, this._cpoll].forEach(t => t && clearInterval(t)); }
+  componentWillUnmount() { this.mounted = false; clearInterval(this._poll); this.clearTimers(); cancelAnimationFrame(this._raf); try { if (super.componentWillUnmount) super.componentWillUnmount(); } catch (e) {} }
+
+  post(path, body) { return fetch(path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: body ? JSON.stringify(body) : undefined }); }
+
+  componentDidMount() {
+    this.mounted = true; this.server = null; this.idxById = new Map(); this.lastEtag = null;
+    this.commentary = {}; this.commentaryEtag = {};
+    this.fetchState(true);
+    this._poll = setInterval(() => this.fetchState(false), 12000);
+  }
+
+  async fetchState(initial) {
+    try {
+      const headers = {}; if (this.lastEtag) headers['If-None-Match'] = this.lastEtag;
+      const r = await fetch('/api/state', { credentials: 'same-origin', headers });
+      if (r.status === 304) return; if (!r.ok) return;
+      const et = r.headers.get('etag'); if (et) this.lastEtag = et;
+      const srv = await r.json();
+      if (this.mounted) this.applyServer(srv, !!initial);
+    } catch (e) {}
+  }
+
+  // Per-match live commentary (Guardian liveblog blocks). Polled only while a
+  // match detail screen is open (see openMatchNews); ETag keeps idle polls cheap.
+  async fetchCommentary(fixtureId) {
+    if (!fixtureId) return;
+    const k = String(fixtureId);
+    try {
+      const headers = {}; if (this.commentaryEtag[k]) headers['If-None-Match'] = this.commentaryEtag[k];
+      const r = await fetch('/api/commentary/' + encodeURIComponent(k), { credentials: 'same-origin', headers });
+      if (r.status === 304) return; if (!r.ok) return;
+      const et = r.headers.get('etag'); if (et) this.commentaryEtag[k] = et;
+      const j = await r.json();
+      this.commentary[k] = j.commentary || [];
+      if (this.mounted && String(this.state.newsKey) === k) this.setState({ _v: ((this.state && this.state._v) || 0) + 1 });
+    } catch (e) {}
+  }
+
+  _st(status) { const u = String(status || '').toUpperCase(); if (['NS','TBD','PST','SUSP','CANC','ABD','AWD','WO','POSTPONED'].includes(u)) return 'sched'; if (['FT','AET','PEN'].includes(u)) return 'ft'; return 'live'; }
+  _kind(type, detail) { const t = (String(type || '') + ' ' + String(detail || '')).toLowerCase(); const notScored = t.indexOf('missed') >= 0 || t.indexOf('saved') >= 0 || t.indexOf('cancel') >= 0 || t.indexOf('disallow') >= 0 || t.indexOf('no goal') >= 0; if (t.indexOf('goal') >= 0 && !notScored) return 'goal'; if (t.indexOf('red') >= 0) return 'red'; if (t.indexOf('yellow') >= 0) return 'yellow'; if (t.indexOf('subst') >= 0) return 'whistle'; return 'whistle'; }
+  _when(ts) { if (!ts) return ''; try { const d = new Date(ts); return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  _clock(ts) { if (!ts) return ''; try { return new Date(ts).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } }
+  _isToday(ts) { if (!ts) return false; try { const d = new Date(ts), n = new Date(); return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate() && d.getTime() >= n.getTime() - 2 * 3600 * 1000; } catch (e) { return false; } }
+  _newsSource(source) { const value = String(source || ''); return value.toLowerCase() === 'bbc' ? 'BBC Sport' : value; }
+  // Per-match headlines: news whose title/trail mentions either team.
+  newsFor(names) { const res = (names || []).filter(Boolean).map(n => String(n).trim()).filter(n => n.length >= 3).map(n => { try { return new RegExp('\\b' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i'); } catch (e) { return null; } }).filter(Boolean); if (!res.length) return []; return (this.news || []).filter(a => { const hay = String(a.title || '') + ' ' + String(a.trail || ''); return res.some(re => re.test(hay)); }).slice(0, 4).map(a => ({ tag: a.is_live ? 'LIVE' : this._newsSource(a.source).toUpperCase(), title: a.title, src: this._newsSource(a.source), url: a.url })); }
+  _ago(ts) { if (!ts) return 'just now'; try { const d = new Date(ts); const m = Math.round((Date.now() - d.getTime()) / 60000); if (m < 1) return 'just now'; if (m < 60) return m + 'm ago'; const h = Math.round(m / 60); if (h < 24) return h + 'h ago'; return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }); } catch (e) { return ''; } }
+  _derive(srv) { if (!srv.me) return 'landing'; if (!srv.me.onboarded) return 'onboard'; if (srv.status === 'registration_open') return 'lobby'; return 'home'; }
+  _nextScreen(srv, initial) {
+    const cur = (this.state && this.state.screen) || 'landing';
+    if (initial) return this._derive(srv);
+    if (!srv.me) return 'landing';
+    if (cur === 'lobby' && srv.status !== 'registration_open') return 'home';
+    if ((cur === 'landing' || cur === 'onboard') && srv.me && this._derive(srv) !== cur) return this._derive(srv);
+    return cur;
+  }
+
+  applyServer(srv, initial) {
+    this.server = srv;
+    const me = srv.me;
+    // Anonymous /api/state intentionally returns only { me: null }. Keep the
+    // seeded design model intact; rebuilding from a missing 48-team payload
+    // would leave the fixed tournament views indexing empty arrays.
+    if (!me && (!Array.isArray(srv.teams) || srv.teams.length < 48)) {
+      this.setState({ _v: ((this.state && this.state._v) || 0) + 1, screen: 'landing', isAdmin: false });
+      return;
+    }
+    const ordered = [];
+    if (me) ordered.push({ id: me.id, name: me.name || 'You', color: me.color || this.monoColors[0], initials: me.initials || 'ME', you: true, isAdmin: !!me.isAdmin });
+    (srv.players || []).filter(p => p.onboarded && !p.removed && (!me || p.id !== me.id)).forEach(p => ordered.push({ id: p.id, name: p.name, color: p.color, initials: p.initials, you: false, isAdmin: p.isAdmin }));
+    if (ordered.length === 0) ordered.push({ id: -1, name: 'You', color: this.monoColors[0], initials: 'ME', you: true });
+    this.players = ordered;
+    this.idxById = new Map(ordered.map((p, i) => [p.id, i]));
+
+    const codeById = new Map((srv.teams || []).map(t => [t.id, t.code]));
+    this.teams = (srv.teams || []).map(t => {
+      const owner = (t.ownerId != null && this.idxById.has(t.ownerId)) ? this.idxById.get(t.ownerId) : (t.idx % this.players.length);
+      return { code: t.code, name: t.name, group: t.group, flag: t.flag, idx: t.idx, owner: owner, _owned: t.ownerId != null };
+    });
+    this.yourTeams = me ? this.teams.filter((t, i) => srv.teams[i].ownerId === me.id) : [];
+
+    const stById = new Map((srv.standings || []).map(s => [s.team_id, s]));
+    this.standings = {};
+    (srv.teams || []).forEach((t, i) => { const s = stById.get(t.id); const gf = s ? s.gf : 0, ga = s ? s.ga : 0; this.standings[i] = { pts: s ? s.points : 0, w: s ? s.w : 0, d: s ? s.d : 0, l: s ? s.l : 0, gd: gf - ga, gf: gf, alive: s ? s.alive : null, rank: s ? s.rank : null }; });
+    for (let g = 0; g < 12; g++) { const ids = [0,1,2,3].map(p => g * 4 + p).filter(id => this.standings[id]); ids.sort((a, b) => this.standings[b].pts - this.standings[a].pts || this.standings[b].gd - this.standings[a].gd || a - b); ids.forEach((id, r) => { if (this.standings[id].rank == null) this.standings[id].rank = r + 1; if (this.standings[id].alive == null) this.standings[id].alive = r < 2; }); }
+
+    this.fixtures = (srv.fixtures || []).map(f => { const st = this._st(f.status); return { id: f.id, md: f.round_ord, g: f.group_letter || '', h: codeById.get(f.home_team_id) || '', a: codeById.get(f.away_team_id) || '', hs: f.home_goals, as: f.away_goals, st: st, min: f.elapsed != null ? (f.elapsed + "'") : (st === 'ft' ? 'FT' : ''), when: this._when(f.kickoff), ko: f.kickoff, rs: String(f.status || '').toUpperCase(), source: f.source }; }).filter(f => f.h && f.a);
+
+    const evByFix = {}; (srv.events || []).forEach(e => { (evByFix[e.fixture_id] = evByFix[e.fixture_id] || []).push(e); });
+    this.news = srv.news || [];
+    const nameById = new Map((srv.teams || []).map(t => [t.id, t.name]));
+    this.matchNews = {};
+    (srv.fixtures || []).forEach(f => { const h = codeById.get(f.home_team_id), a = codeById.get(f.away_team_id); if (!h || !a) return; const st = this._st(f.status); this.matchNews[String(f.id)] = { h: h, a: a, hs: f.home_goals || 0, as: f.away_goals || 0, status: st, min: f.elapsed != null ? (f.elapsed + "'") : 'FT', when: this._when(f.kickoff), group: f.group_letter || '', stadium: '', headlines: this.newsFor([nameById.get(f.home_team_id), nameById.get(f.away_team_id)]), events: (evByFix[f.id] || []).map(ev => ({ min: ev.minute != null ? (ev.minute + "'") : '', kind: this._kind(ev.type, ev.detail), side: ev.team_id === f.home_team_id ? 'h' : (ev.team_id === f.away_team_id ? 'a' : ''), title: ev.player || ev.type || '', sub: ev.detail || '' })) }; });
+
+    const next = this._nextScreen(srv, initial);
+    this.setState({ _v: ((this.state && this.state._v) || 0) + 1, screen: next, isAdmin: !!(me && me.isAdmin), playersNum: srv.playerCount || 0, teamsNum: (srv.teams || []).length, adminStatus: srv.status, adminCode: srv.joinCode, audit: (srv.audit || []).map(a => ({ action: a.action, who: a.who, ago: this._ago(a.at) })) });
+  }
+
+  homeMeta() { return this.yourTeams.map(t => { const st = this.standings[t.idx] || { pts: 0, w: 0, d: 0, l: 0, gf: 0, alive: true }; const nx = this.nextFixtureFor(t.code); return { pts: st.pts, rec: st.w + '–' + st.d + '–' + st.l, stage: st.alive ? 'GROUP' : 'OUT', alive: st.alive, gf: st.gf, nextOpp: nx ? nx.opp : '—', nextWhen: nx ? nx.when : '—' }; }); }
+  nextFixtureFor(code) { const f = this.fixtures.find(f => (f.h === code || f.a === code) && f.st === 'sched'); if (!f) return null; const oc = f.h === code ? f.a : f.h; const o = this.byCode(oc); return { opp: o ? o.name : oc, when: f.when || 'TBD' }; }
+  // Global 2026 football tracker: live matches first, then most-recent results, then
+  // today's remaining kickoffs. NOT filtered to the user's squad — surfaces any
+  // in-progress match regardless of how many earlier-kickoff games precede it.
+  homeTicker() {
+    const fx = this.fixtures;
+    const live = fx.filter(f => f.st === 'live');
+    const ft = fx.filter(f => f.st === 'ft').reverse().slice(0, 4);            // most-recent finished first (fixtures are kickoff-ascending)
+    const UPCOMING = ['NS', 'TBD'];                                           // genuinely not-yet-started; _st() also folds PST/CANC/ABD/AWD/WO/POSTPONED/SUSP into 'sched', and those are not real upcoming kickoffs
+    const upcoming = fx.filter(f => UPCOMING.includes(f.rs) && this._isToday(f.ko));  // today's remaining kickoffs, soonest first
+    return live.concat(ft, upcoming).slice(0, 8).map(f => {
+      const hn = (this.byCode(f.h) || {}).name || f.h, an = (this.byCode(f.a) || {}).name || f.a;
+      const isLive = f.st === 'live', isFt = f.st === 'ft';
+      const score = (f.hs == null ? 0 : f.hs) + '–' + (f.as == null ? 0 : f.as);
+      const txt = isLive ? (hn + ' ' + score + ' ' + an)
+                : isFt   ? ('FT — ' + hn + ' ' + score + ' ' + an)
+                :          (hn + ' vs ' + an);
+      const meta = isLive ? (f.min + ' · Group ' + f.g)
+                : isFt    ? ('Group ' + f.g)
+                :           (this._clock(f.ko) + ' · Group ' + f.g);
+      return { key: String(f.id), live: isLive, sched: f.st === 'sched', txt: txt, meta: meta };
+    });
+  }
+
+
+  // landing
+  onCode = (e) => this.setState({ joinCode: (e.target.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) });
+  onEmail = (e) => this.setState({ email: e.target.value });
+  sendLink = async () => { const email = (this.state.email || '').trim(); if (!/^\S+@\S+\.\S+$/.test(email)) return; this.setState({ linkSent: true }); try { await this.post('/auth/request', { email: email }); } catch (e) {} };
+  openMagic = async () => { await this.fetchState(false); };
+
+  // onboard
+  onName = (e) => this.setState({ name: e.target.value });
+  joinLobby = async () => {
+    const nm = this.state.name.trim();
+    if (!nm) return;
+    const color = this.monoColors[this.state.mono];
+    try { await this.post('/api/onboard', { display_name: nm, monogram_color: color }); } catch (e) {}
+    await this.fetchState(false);
+    this.setState({ screen: 'lobby' });
+  };
+  enterLobby() { /* live lobby counts come from /api/state polling */ }
+
+  // draw
+  runDraw = async () => {
+    try { const r = await this.post('/api/draw'); if (!r.ok) { const j = await r.json().catch(() => ({})); if (j.error === 'too_few_players') alert('Need at least ' + (j.need || 2) + ' players to run the draw (have ' + (j.have || 0) + ').'); return; } } catch (e) { return; }
+    await this.fetchState(false);
+    this.clearTimers();
+    this.setState({ screen: 'draw', drawPhase: 'pre', dealt: 0, revealed: 0, flipped: {}, torn: false });
+  };
+
+  // ── synth audio (no assets) + haptics ──
+  ac() { if (this.props.sound === false) return null; try { if (!this._ac) this._ac = new (window.AudioContext || window.webkitAudioContext)(); if (this._ac.state === 'suspended') this._ac.resume(); return this._ac; } catch (e) { return null; } }
+  tone(freq, dur, type, vol, slideTo) { const ac = this.ac(); if (!ac) return; const t = ac.currentTime; const o = ac.createOscillator(); const g = ac.createGain(); o.type = type || 'sine'; o.frequency.setValueAtTime(freq, t); if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur); g.gain.setValueAtTime(vol || 0.12, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + 0.02); }
+  noise(dur, vol) { const ac = this.ac(); if (!ac) return; const t = ac.currentTime; const n = Math.floor(ac.sampleRate * dur); const buf = ac.createBuffer(1, n, ac.sampleRate); const d = buf.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / n); const src = ac.createBufferSource(); src.buffer = buf; const f = ac.createBiquadFilter(); f.type = 'bandpass'; f.frequency.setValueAtTime(1400, t); f.frequency.exponentialRampToValueAtTime(280, t + dur); const g = ac.createGain(); g.gain.setValueAtTime(vol || 0.25, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); src.connect(f); f.connect(g); g.connect(ac.destination); src.start(t); }
+  buzz(p) { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} }
+  click(i) { this.tone(420 + (i % 12) * 26, 0.05, 'triangle', 0.05); }
+  flipSound() { this.noise(0.13, 0.16); this.tone(520, 0.16, 'sine', 0.1, 940); }
+  fanfare() { [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => this.tone(f, 0.32, 'triangle', 0.11), i * 90)); }
+  tearSound() { this.noise(0.5, 0.4); this.tone(380, 0.5, 'sawtooth', 0.08, 90); }
+
+  openPack = () => {
+    this.clearTimers();
+    this.tearSound(); this.buzz([18, 36, 70]);
+    this.setState({ drawPhase: 'tearing', torn: false });
+    requestAnimationFrame(() => requestAnimationFrame(() => this.setState({ torn: true })));
+    setTimeout(() => this.startDealing(), 760);
+  };
+  startDealing() {
+    this.setState({ drawPhase: 'dealing', dealt: 0 });
+    this._deal = setInterval(() => {
+      this.setState(s => {
+        const d = s.dealt + 1;
+        if (d % 3 === 0) this.click(d);
+        if (d % 10 === 0) this.buzz(6);
+        if (d >= 48) { clearInterval(this._deal); setTimeout(() => this.enterYours(), 460); }
+        return { dealt: d };
+      });
+    }, 40);
+  }
+  enterYours() {
+    this.setState({ drawPhase: 'yours', revealed: 0, flipped: {} });
+    this.fanfare(); this.buzz([40, 30, 120]);
+    if (this.props.confetti !== false) setTimeout(() => this.fireConfetti(), 120);
+    let n = 0;
+    this._rev = setInterval(() => {
+      n++;
+      this.flipSound(); this.buzz(28);
+      this.setState(s => ({ revealed: n, flipped: { ...s.flipped, [n - 1]: true } }));
+      if (n >= this.yourTeams.length) clearInterval(this._rev);
+    }, 360);
+  }
+  flipCard = (i) => { this.flipSound(); this.buzz(22); this.setState(s => ({ flipped: { ...s.flipped, [i]: !s.flipped[i] } })); };
+  continueToDone = () => this.setState({ drawPhase: 'done' });
+  enterHome = () => { this.clearTimers(); this.setState({ screen: 'home' }); };
+  setPotFilter = (f) => this.setState({ potFilter: f });
+  togglePlayer = (i) => this.setState(s => ({ openPlayer: s.openPlayer === i ? null : i }));
+  setMcView = (v) => this.setState({ mcView: v });
+  setMcFilter = (f) => this.setState({ mcFilter: f });
+  // ── admin ──
+  logAudit = (action) => this.setState(s => ({ audit: [{ action, who: 'admin', ago: 'just now' }, ...s.audit].slice(0, 8) }));
+  setStatus = async (st) => { try { await this.post('/api/status', { status: st }); } catch (e) {} await this.fetchState(false); };
+  regenCode = async () => { try { await this.post('/api/regen-code'); } catch (e) {} await this.fetchState(false); };
+  onInviteEmail = (e) => this.setState({ inviteEmail: e.target.value, inviteState: 'idle' });
+  sendInvite = async () => {
+    const em = this.state.inviteEmail.trim();
+    if (!/^\S+@\S+\.\S+$/.test(em) || this.state.inviteState === 'sending') return;
+    this.setState({ inviteState: 'sending' }); this.buzz(14);
+    let ok = false;
+    try {
+      const r = await this.post('/api/invite', { email: em });
+      ok = r.ok;
+      if (!ok) { const j = await r.json().catch(() => ({})); alert(j.error === 'locked' ? 'Invites are closed — the draw has already run.' : 'Could not send that invite. Check the address and try again.'); }
+    } catch (e) {}
+    if (!ok) { this.setState({ inviteState: 'idle' }); return; }
+    this.setState(s => ({ inviteState: 'sent', inviteEmail: '', invitesSent: [{ email: em, code: s.adminCode, ago: 'just now' }, ...(s.invitesSent || [])].slice(0, 6) }));
+    this.tone(660, 0.18, 'triangle', 0.09, 990);
+    this.fetchState(false);
+  };
+  forceRefresh = async () => { if (this.state.syncing) return; this.setState({ syncing: true }); try { await this.post('/api/force-refresh'); } catch (e) {} await this.fetchState(false); this.setState({ syncing: false, lastSync: 'just now', feedFails: 0 }); };
+  removePlayer = async (i) => { const p = this.players[i]; if (!p || p.id == null || p.id < 0) return; try { await this.post('/api/player/' + p.id + '/remove'); } catch (e) {} await this.fetchState(false); };
+  openMatchEdit = () => { const f = this.fixtures[0]; if (!f) return; this.setState({ matchEdit: 0, mEditHs: f.hs || 0, mEditAs: f.as || 0, mEditStatus: f.st }); };
+  closeMatchEdit = () => this.setState({ matchEdit: null });
+  bumpScore = (side, d) => this.setState(s => { const k = side === 'h' ? 'mEditHs' : 'mEditAs'; return { [k]: Math.max(0, s[k] + d) }; });
+  saveMatchEdit = async () => { const f = this.fixtures[0]; if (!f || f.id == null) { this.setState({ matchEdit: null }); return; } const st = this.state.mEditStatus === 'live' ? '2H' : (this.state.mEditStatus === 'ft' ? 'FT' : 'NS'); try { await this.post('/api/match/' + f.id + '/override', { home_goals: this.state.mEditHs, away_goals: this.state.mEditAs, status: st }); } catch (e) {} await this.fetchState(false); this.setState({ matchEdit: null }); };
+  byCode(c) { return this.teams.find(t => t.code === c); }
+  openMatchNews = (key) => {
+    this.clearTimers();
+    this.setState({ screen: 'matchnews', newsKey: key, returnTo: this.state.screen });
+    this.fetchCommentary(key);
+    if ((this.matchNews[String(key)] || {}).status === 'live') this._cpoll = setInterval(() => this.fetchCommentary(key), 15000);
+  };
+  backFromNews = () => { this.clearTimers(); this.setState({ screen: this.state.returnTo || 'home' }); };
+  resetGame = async () => {
+    if (!window.confirm('Wipe the draw and ALL other players, and reopen registration? You stay signed in.')) return;
+    if (!window.confirm('Are you absolutely sure? This cannot be undone.')) return;
+    try { const r = await this.post('/api/reset-game'); if (!r || !r.ok) { window.alert('Reset failed.'); return; } } catch (e) { return; }
+    await this.fetchState(false);
+    this.setState({ screen: 'lobby' });
+  };
+
+  logout = async () => {
+    this.buzz(14);
+    try { await this.post('/auth/logout'); } catch (e) {}
+    // Hard reload: clears the session cookie's effect, timers and cached state,
+    // and re-routes to the landing screen (no `me` ⇒ landing).
+    window.location.href = '/';
+  };
+
+  // shared: compute leaderboard from standings
+  computeBoard() {
+    if (this.server && this.server.leaderboard) {
+      const meId = this.server.me ? this.server.me.id : null;
+      const rows = this.server.leaderboard.map(row => { const i = this.idxById.has(row.id) ? this.idxById.get(row.id) : 0; const owned = this.teams.filter(t => t.owner === i); return { i: i, name: row.name, color: row.color, initials: row.initials, you: row.id === meId, owned: owned, score: row.score, goals: row.goals, alive: row.alive, teams: row.teams, move: row.move || 0, rank: row.rank }; });
+      if (meId != null && !rows.some(r => r.you)) rows.push({ i: 0, name: (this.server.me.name || 'You'), color: (this.server.me.color || this.monoColors[0]), initials: (this.server.me.initials || 'ME'), you: true, owned: [], score: 0, goals: 0, alive: 0, teams: 0, move: 0, rank: rows.length + 1 });
+      return rows;
+    }
+    const rows = this.players.map((p, i) => { const owned = this.teams.filter(t => t.owner === i); let match = 0, goals = 0, alive = 0; owned.forEach(t => { const st = this.standings[t.idx] || { pts: 0, gf: 0, alive: false }; match += st.pts; goals += st.gf; if (st.alive) alive++; }); return { i, name: p.name, color: p.color, initials: p.initials, you: p.you, owned, score: match + goals, goals, alive, teams: owned.length, move: 0 }; });
+    rows.sort((a, b) => b.score - a.score || b.alive - a.alive || b.goals - a.goals || a.i - b.i);
+    rows.forEach((r, idx) => { r.rank = idx + 1; });
+    return rows;
+  }
+  replay = () => { this.clearTimers(); cancelAnimationFrame(this._raf); this.setState({ screen: 'home' }); };
+
+  fireConfetti() {
+    const cv = this.canvas; if (!cv) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = cv.clientWidth || 398, H = cv.clientHeight || 878;
+    cv.width = W * dpr; cv.height = H * dpr;
+    const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+    const cols = ['#00e676','#16ff7a','#ffffff','#ffd23b','#ff4d6d','#3b8cff'];
+    const P = [];
+    for (let i = 0; i < 170; i++) {
+      const a = Math.random() * Math.PI * 2, sp = 4 + Math.random() * 10;
+      P.push({ x: W / 2, y: H * 0.32, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 7, w: 5 + Math.random() * 7, h: 8 + Math.random() * 9, rot: Math.random() * 6, vr: -0.3 + Math.random() * 0.6, c: cols[i % cols.length], life: 0, max: 95 + Math.random() * 45 });
+    }
+    const tick = () => {
+      ctx.clearRect(0, 0, W, H);
+      let alive = false;
+      for (const p of P) {
+        if (p.life > p.max) continue;
+        p.life++; alive = true;
+        p.vy += 0.28; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.globalAlpha = Math.max(0, 1 - p.life / p.max);
+        ctx.fillStyle = p.c; ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+      }
+      if (alive) this._raf = requestAnimationFrame(tick); else ctx.clearRect(0, 0, W, H);
+    };
+    cancelAnimationFrame(this._raf); this._raf = requestAnimationFrame(tick);
+  }
+
+  go(screen) {
+    if (screen === 'lobby') { this.players[0].name = this.state.name.trim() || 'You'; this.setState({ screen: 'lobby' }); this.enterLobby(); }
+    else if (screen === 'draw') { this.runDraw(); }
+    else { this.clearTimers(); this.setState({ screen }); }
+  }
+
+  renderVals() {
+    const s = this.state;
+    const boxBase = (bg, mine, shown) => ({ position: 'relative', borderRadius: 7, overflow: 'hidden', aspectRatio: '3 / 4', background: '#0a1d13', border: mine ? '1.5px solid #16ff7a' : '1px solid rgba(255,255,255,.06)', boxShadow: mine && shown ? '0 0 11px rgba(0,230,118,.55)' : 'none', transition: 'box-shadow .3s,border-color .3s' });
+    const torn = s.torn;
+    const foilHalf = (top) => ({ position: 'absolute', left: 0, width: '100%', height: '52%', [top ? 'top' : 'bottom']: 0, borderRadius: top ? '22px 22px 5px 5px' : '5px 5px 22px 22px', background: 'linear-gradient(155deg,#0a3a22,#022012)', border: '1.5px solid rgba(0,230,118,.4)', [top ? 'borderBottom' : 'borderTop']: '2px solid #16ff7a', boxShadow: '0 0 16px rgba(0,230,118,.45)', display: 'flex', alignItems: top ? 'flex-start' : 'flex-end', justifyContent: 'center', transition: 'transform .7s cubic-bezier(.3,.8,.3,1),opacity .7s', transform: torn ? (top ? 'translateY(-160%) rotate(-7deg)' : 'translateY(160%) rotate(7deg)') : 'translateY(0) rotate(0)', opacity: torn ? 0 : 1 });
+    const tearTopStyle = foilHalf(true);
+    const tearBotStyle = foilHalf(false);
+
+    const codeChars = Array.from({ length: 6 }).map((_, i) => {
+      const ch = s.joinCode[i] || '';
+      return { ch, style: { width: '100%', height: 54, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 26, color: '#eafff0', background: 'rgba(0,0,0,.3)', border: ch ? '1.5px solid rgba(0,230,118,.6)' : '1.5px solid rgba(255,255,255,.1)', boxShadow: ch ? '0 0 12px rgba(0,230,118,.25)' : 'none' } };
+    });
+
+    const canSend = /^\S+@\S+\.\S+$/.test(s.email);
+    const sendBtnStyle = { position: 'relative', overflow: 'hidden', width: '100%', height: 56, border: 'none', borderRadius: 16, background: canSend ? 'linear-gradient(180deg,#1bff84,#00c95f)' : 'rgba(255,255,255,.07)', color: canSend ? '#022a14' : '#5f7768', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 22, letterSpacing: '1.5px', cursor: canSend ? 'pointer' : 'not-allowed', boxShadow: canSend ? '0 12px 30px rgba(0,230,118,.42)' : 'none' };
+
+    const monoOptions = this.monoColors.map((c, i) => ({ color: c, onClick: () => this.setState({ mono: i }), style: { width: '100%', aspectRatio: '1', borderRadius: 14, background: c, cursor: 'pointer', transition: 'transform .15s', transform: i === s.mono ? 'scale(1)' : 'scale(.84)', boxShadow: i === s.mono ? `0 0 0 3px #04110a,0 0 0 5px ${c},0 6px 16px ${c}66` : 'none', opacity: i === s.mono ? 1 : .68 } }));
+    const previewInitials = s.name.trim() ? s.name.trim().slice(0, 2).toUpperCase() : 'ME';
+    const pc = this.monoColors[s.mono];
+    const previewTileStyle = { width: 116, height: 116, borderRadius: 30, background: `linear-gradient(160deg,${pc},${pc}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 50, color: '#04110a', boxShadow: `0 0 0 3px #04110a,0 0 0 5px ${pc},0 16px 40px ${pc}55`, animation: 'pop .4s ease both' };
+    const canJoin = s.name.trim().length > 0;
+    const joinBtnStyle = { marginTop: 'auto', width: '100%', height: 58, border: 'none', borderRadius: 18, background: canJoin ? 'linear-gradient(180deg,#1bff84,#00c95f)' : 'rgba(255,255,255,.07)', color: canJoin ? '#022a14' : '#5f7768', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 23, letterSpacing: '1.5px', cursor: canJoin ? 'pointer' : 'not-allowed', boxShadow: canJoin ? '0 12px 30px rgba(0,230,118,.42)' : 'none' };
+
+    const lobbyTiles = this.players.map((p, i) => ({
+      initials: p.initials, name: p.name,
+      box: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, animation: 'pop .5s cubic-bezier(.2,.9,.2,1) both', animationDelay: (i * 0.07) + 's' },
+      square: { width: '100%', aspectRatio: '1', borderRadius: 16, background: `linear-gradient(160deg,${p.color},${p.color}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', boxShadow: p.you ? '0 0 0 2px #04110a,0 0 0 4px #16ff7a,0 6px 16px rgba(0,230,118,.3)' : 'inset 0 -8px 18px rgba(0,0,0,.28)' },
+      initStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 22, color: '#04110a' },
+      nameStyle: { fontFamily: "'Barlow'", fontWeight: p.you ? 700 : 500, fontSize: 12.5, color: p.you ? '#16ff7a' : '#9fc8af', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+    }));
+
+    const roleLabel = s.isAdmin ? 'ADMIN' : 'PLAYER';
+    const roleChip = { padding: '4px 12px', borderRadius: 999, fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 13, letterSpacing: '1px', cursor: 'pointer', background: s.isAdmin ? 'rgba(0,230,118,.16)' : 'rgba(120,160,255,.16)', border: s.isAdmin ? '1px solid rgba(0,230,118,.4)' : '1px solid rgba(120,160,255,.4)', color: s.isAdmin ? '#16ff7a' : '#9fc8ff' };
+
+    const cells = this.teams.map(t => {
+      const shown = t.idx < s.dealt, mine = t.owner === 0, oc = this.players[t.owner].color;
+      return { box: boxBase(t.flag, mine, shown), flagStyle: { position: 'absolute', inset: 0, background: t.flag, opacity: shown ? 1 : 0, transform: shown ? 'scale(1)' : 'scale(.45)', transition: 'all .34s cubic-bezier(.2,.8,.2,1)' }, dotStyle: { position: 'absolute', bottom: 3, right: 3, width: 7, height: 7, borderRadius: '50%', background: oc, opacity: shown ? 1 : 0, transition: 'opacity .3s', boxShadow: '0 0 0 1.5px rgba(0,0,0,.55)' } };
+    });
+    const dealtLabel = s.dealt + '/48';
+    const dealBarStyle = { height: '100%', width: (s.dealt / 48 * 100) + '%', background: 'linear-gradient(90deg,#00c95f,#16ff7a)', borderRadius: 4, transition: 'width .12s linear', boxShadow: '0 0 10px rgba(0,230,118,.6)' };
+
+    const yourCards = this.yourTeams.map((t, i) => {
+      const fl = !!s.flipped[i];
+      return { name: t.name, group: 'GROUP ' + t.group, flipped: fl, onClick: () => this.flipCard(i), outer: { position: 'relative', perspective: '900px', flex: 'none', width: 156, height: 216, scrollSnapAlign: 'center' }, inner: { position: 'relative', width: '100%', height: '100%', transformStyle: 'preserve-3d', transition: 'transform .7s cubic-bezier(.2,.9,.2,1)', transform: fl ? 'rotateY(180deg)' : 'rotateY(0deg)' }, back: { position: 'absolute', inset: 0, borderRadius: 18, overflow: 'hidden', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: t.flag, backgroundSize: 'cover', border: '1.5px solid rgba(255,255,255,.18)' } };
+    });
+
+    const yourRows = this.yourTeams.map(t => ({ name: t.name, code: t.code, group: 'Group ' + t.group, flagThumb: { width: 46, height: 34, borderRadius: 7, background: t.flag, flex: 'none', boxShadow: '0 2px 6px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.12)' } }));
+
+    // ── Home dashboard simulated state ──
+    const meta = this.homeMeta();
+    const homeSquad = this.yourTeams.map((t, i) => {
+      const m = meta[i];
+      return {
+        name: t.name, code: t.code, flag: t.flag, alive: m.alive,
+        cardStyle: { position: 'relative', flex: 'none', width: 132, borderRadius: 16, overflow: 'hidden', background: 'linear-gradient(180deg,rgba(255,255,255,.05),rgba(6,22,14,.7))', border: m.alive ? '1px solid rgba(0,230,118,.25)' : '1px solid rgba(255,255,255,.08)', scrollSnapAlign: 'start', opacity: m.alive ? 1 : 0.55 },
+        flagStyle: { position: 'relative', height: 70, background: t.flag },
+        scrim: { position: 'absolute', inset: 0, background: m.alive ? 'linear-gradient(180deg,transparent 40%,rgba(6,22,14,.7))' : 'linear-gradient(180deg,rgba(6,22,14,.5),rgba(6,22,14,.85))' },
+        stageBadge: { position: 'absolute', top: 8, left: 8, padding: '3px 8px', borderRadius: 7, fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 10.5, letterSpacing: '1px', background: m.alive ? '#16ff7a' : 'rgba(255,77,109,.9)', color: m.alive ? '#022a14' : '#fff' },
+        nm: t.name, grp: 'GROUP ' + t.group, rec: m.rec, pts: m.pts, stage: m.stage,
+        ptsStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 30, lineHeight: .9, color: m.alive ? '#16ff7a' : '#7fbf98' },
+      };
+    });
+    const headlineScore = meta.reduce((a, m) => a + m.pts, 0);
+    const aliveCount = meta.filter(m => m.alive).length;
+    const myTeamCount = meta.length; // real # of teams this player owns (was hardcoded "5")
+    const topOwned = homeSquad.slice().sort((a, b) => b.pts - a.pts)[0];
+    const topTeamSuffix = (topOwned && topOwned.pts > 0) ? ' · ' + topOwned.nm + ' carrying you' : '';
+    // Your upcoming fixtures, fixture-centric: one row per match (so two of your
+    // teams meeting isn't shown twice) ordered by soonest kickoff. this.fixtures
+    // is kickoff-ascending; restrict to genuinely not-started games (NS/TBD) so a
+    // postponed/cancelled fixture isn't surfaced as "next".
+    const myCodes = new Set(this.yourTeams.map((t) => t.code));
+    const flagCell = (bg) => ({ width: 34, height: 24, borderRadius: 5, background: bg, flex: 'none', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' });
+    const fixtures = this.fixtures
+      .filter((f) => (f.rs === 'NS' || f.rs === 'TBD') && (myCodes.has(f.h) || myCodes.has(f.a)))
+      .slice(0, 4)
+      .map((f) => {
+        const mineHome = myCodes.has(f.h);
+        const youT = this.byCode(mineHome ? f.h : f.a) || {}, oppT = this.byCode(mineHome ? f.a : f.h) || {};
+        return { yourFlag: flagCell(youT.flag), oppFlag: flagCell(oppT.flag), you: youT.name || (mineHome ? f.h : f.a), opp: oppT.name || (mineHome ? f.a : f.h), when: f.when, grp: 'Group ' + f.g };
+      });
+    const tickerDot = (e) => e.sched
+      ? { width: 8, height: 8, borderRadius: '50%', flex: 'none', background: 'transparent', boxShadow: 'inset 0 0 0 1.5px #c79a3a' }
+      : { width: 8, height: 8, borderRadius: '50%', flex: 'none', background: e.live ? '#16ff7a' : '#3f6b53', animation: e.live ? 'livedot 1.3s ease-in-out infinite' : 'none', boxShadow: e.live ? '0 0 8px #16ff7a' : 'none' };
+    const ticker = this.homeTicker().map(e => ({ ...e, onClick: () => this.openMatchNews(e.key), rowStyle: { display: 'flex', alignItems: 'center', gap: 11, padding: '12px 14px', background: 'rgba(255,255,255,.03)', borderBottom: '1px solid rgba(255,255,255,.05)', cursor: 'pointer' }, dot: tickerDot(e) }));
+    const liveNow = this.fixtures.filter(f => f.st === 'live').length;
+    const hasLive = liveNow > 0, liveLabel = liveNow + ' LIVE', hasTicker = ticker.length > 0, emptyTicker = ticker.length === 0;
+    const latestNews = (this.news || []).slice(0, 6).map(a => ({ title: a.title, url: a.url, meta: this._newsSource(a.source) + (a.is_live ? ' · LIVE' : '') + ' · ' + this._ago(a.published_at), rowStyle: { display: 'flex', alignItems: 'center', gap: 11, padding: '12px 14px', background: 'rgba(255,255,255,.03)', borderBottom: '1px solid rgba(255,255,255,.05)', textDecoration: 'none', cursor: 'pointer' } }));
+    const hMono = this.players[0].color, hInit = this.players[0].initials, hName = this.players[0].name;
+    const homeMonoStyle = { width: 46, height: 46, borderRadius: 13, flex: 'none', background: `linear-gradient(160deg,${hMono},${hMono}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 20, color: '#04110a', boxShadow: `0 0 0 2px #04110a,0 0 0 3px ${hMono}` };
+    const tabIcons = {
+      home: '<path d="M3 11.5L12 4l9 7.5M5 10v9h5v-6h4v6h5v-9" fill="none" stroke="CC" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+      pot: '<circle cx="12" cy="12" r="8.5" fill="none" stroke="CC" stroke-width="2"/><path d="M3.5 12h17M12 3.5c2.5 2.3 2.5 14.7 0 17M12 3.5c-2.5 2.3-2.5 14.7 0 17" fill="none" stroke="CC" stroke-width="2"/>',
+      bracket: '<path d="M4 5h5v6h4M4 19h5v-6M15 12h5" fill="none" stroke="CC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+      board: '<path d="M5 20V9M12 20V4M19 20v-8" fill="none" stroke="CC" stroke-width="2.2" stroke-linecap="round"/>',
+      admin: '<circle cx="12" cy="8" r="3.4" fill="none" stroke="CC" stroke-width="2"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" fill="none" stroke="CC" stroke-width="2" stroke-linecap="round"/>',
+    };
+    const tabDefs = [['home', 'Home'], ['pot', 'Pot'], ['bracket', 'Bracket'], ['board', 'Board']];
+    if (s.isAdmin) tabDefs.push(['admin', 'Admin']);
+    const homeTabs = tabDefs.map(([key, label]) => {
+      const active = key === s.screen;
+      const navigable = key === 'home' || key === 'pot' || key === 'board' || key === 'bracket' || key === 'admin';
+      const col = active ? '#16ff7a' : navigable ? '#9fc8af' : '#46584d';
+      return { label, key, active, iconHtml: { __html: tabIcons[key].replace(/CC/g, col) }, labelStyle: { fontFamily: "'Barlow'", fontWeight: active ? 700 : 500, fontSize: 10.5, letterSpacing: '.3px', color: col }, wrap: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1, cursor: navigable && !active ? 'pointer' : 'default' }, onClick: navigable ? () => this.go(key) : () => {} };
+    });
+
+    // ── The Pot: grouped standings, filterable ──
+    const G = 'ABCDEFGHIJKL';
+    const ownerChip = (oi, mine) => { const p = this.players[oi]; return { chip: { display: 'inline-flex', alignItems: 'center', gap: 5, padding: '2px 7px 2px 2px', borderRadius: 999, background: mine ? 'rgba(0,230,118,.14)' : 'rgba(255,255,255,.05)', border: mine ? '1px solid rgba(0,230,118,.3)' : '1px solid rgba(255,255,255,.08)' }, sq: { width: 17, height: 17, borderRadius: 5, flex: 'none', background: `linear-gradient(160deg,${p.color},${p.color}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 9, color: '#04110a' }, nm: p.name, init: p.initials, txt: { fontFamily: "'Barlow'", fontWeight: 600, fontSize: 11, color: mine ? '#16ff7a' : '#9fc8af', maxWidth: 58, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }; };
+    const potSections = [];
+    for (let g = 0; g < 12; g++) {
+      let rows = [0, 1, 2, 3].map(p => g * 4 + p);
+      rows.sort((a, b) => this.standings[a].rank - this.standings[b].rank);
+      rows = rows.map(i => {
+        const t = this.teams[i], st = this.standings[i], mine = t.owner === 0, oc = ownerChip(t.owner, mine);
+        return {
+          mine, alive: st.alive, rank: st.rank, ownerName: oc.nm,
+          rowStyle: { display: 'flex', alignItems: 'center', gap: 10, padding: '9px 11px', borderRadius: 12, background: mine ? 'rgba(0,230,118,.07)' : 'transparent', border: mine ? '1px solid rgba(0,230,118,.22)' : '1px solid transparent', opacity: st.alive ? 1 : 0.5 },
+          rankStyle: { width: 18, textAlign: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 15, color: st.rank <= 2 ? '#16ff7a' : '#5f7768', flex: 'none' },
+          flagStyle: { width: 30, height: 21, borderRadius: 4, flex: 'none', background: t.flag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' },
+          name: t.name, code: t.code,
+          chip: oc.chip, sq: oc.sq, ownerInit: oc.init, ownerTxt: oc.txt,
+          pts: st.pts,
+          ptsStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 18, color: '#eafff0', width: 22, textAlign: 'right', flex: 'none' },
+          aliveDot: { width: 7, height: 7, borderRadius: '50%', flex: 'none', background: st.alive ? '#16ff7a' : '#ff4d6d', boxShadow: st.alive ? '0 0 7px rgba(0,230,118,.7)' : 'none' },
+        };
+      });
+      if (s.potFilter === 'mine') rows = rows.filter(r => r.mine);
+      if (s.potFilter === 'alive') rows = rows.filter(r => r.alive);
+      if (rows.length) potSections.push({ letter: 'GROUP ' + G[g], rows });
+    }
+    const potFilters = [['all', 'All 48'], ['mine', 'My teams'], ['alive', 'Still alive']].map(([key, label]) => {
+      const active = s.potFilter === key;
+      return { label, onClick: () => this.setPotFilter(key), style: { flex: 'none', padding: '8px 15px', borderRadius: 999, border: active ? '1px solid rgba(0,230,118,.5)' : '1px solid rgba(255,255,255,.1)', background: active ? 'rgba(0,230,118,.16)' : 'rgba(255,255,255,.04)', color: active ? '#16ff7a' : '#8fae9c', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 15, letterSpacing: '.5px', cursor: 'pointer' } };
+    });
+    const potAlive = Object.values(this.standings).filter(x => x.alive).length;
+
+    // ── Match Centre: fixtures feed + projected knockout bracket ──
+    const slot = (code) => { const t = code ? this.byCode(code) : null; return t ? { code, name: t.name, flag: t.flag, mine: t.owner === 0, alive: this.standings[t.idx].alive } : null; };
+    let mcRows = this.fixtures.map((f, i) => {
+      const h = this.byCode(f.h), a = this.byCode(f.a);
+      const mine = h.owner === 0 || a.owner === 0;
+      const live = f.st === 'live', sched = f.st === 'sched';
+      return {
+        i, mine, live, sched, md: f.md, group: 'Group ' + f.g,
+        rowStyle: { display: 'flex', alignItems: 'center', gap: 11, padding: '12px 13px', borderRadius: 14, background: mine ? 'rgba(0,230,118,.07)' : 'rgba(255,255,255,.035)', border: mine ? '1px solid rgba(0,230,118,.24)' : '1px solid rgba(255,255,255,.06)' },
+        hFlag: { width: 28, height: 20, borderRadius: 4, flex: 'none', background: h.flag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' },
+        aFlag: { width: 28, height: 20, borderRadius: 4, flex: 'none', background: a.flag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' },
+        hName: h.code, aName: a.code, hOwn: h.owner === 0, aOwn: a.owner === 0,
+        hNameStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 16, color: h.owner === 0 ? '#16ff7a' : '#eafff0', minWidth: 38 },
+        aNameStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 16, color: a.owner === 0 ? '#16ff7a' : '#eafff0', minWidth: 38, textAlign: 'right' },
+        score: sched ? f.when : (f.hs + '–' + f.as),
+        scoreStyle: sched ? { fontFamily: "'Barlow'", fontWeight: 600, fontSize: 12, color: '#8fae9c', minWidth: 92, textAlign: 'center' } : { fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 22, color: '#eafff0', minWidth: 56, textAlign: 'center', letterSpacing: '1px' },
+        statusBadge: live ? { txt: f.min, style: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 8px', borderRadius: 7, background: 'rgba(255,77,109,.16)', border: '1px solid rgba(255,77,109,.4)', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 11, color: '#ff6b85' } } : sched ? { txt: f.md ? 'MD' + f.md : 'SCHED', style: { padding: '3px 8px', borderRadius: 7, background: 'rgba(255,255,255,.06)', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 11, color: '#7fbf98' } } : { txt: 'FT', style: { padding: '3px 8px', borderRadius: 7, background: 'rgba(255,255,255,.06)', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 11, color: '#7fbf98' } },
+        live2: live,
+      };
+    });
+    if (s.mcFilter === 'mine') mcRows = mcRows.filter(r => r.mine);
+    if (s.mcFilter === 'live') mcRows = mcRows.filter(r => r.live);
+    const mcFilters = [['all', 'All'], ['mine', 'My matches'], ['live', 'Live']].map(([key, label]) => {
+      const active = s.mcFilter === key;
+      return { label, onClick: () => this.setMcFilter(key), style: { flex: 'none', padding: '7px 14px', borderRadius: 999, border: active ? '1px solid rgba(0,230,118,.5)' : '1px solid rgba(255,255,255,.1)', background: active ? 'rgba(0,230,118,.16)' : 'rgba(255,255,255,.04)', color: active ? '#16ff7a' : '#8fae9c', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 14, cursor: 'pointer' } };
+    });
+
+    // projected bracket: 24 group qualifiers + 8 best thirds, seeded
+    const seedAll = Object.keys(this.standings).map(k => ({ i: +k, ...this.standings[+k] }));
+    const q = seedAll.filter(x => x.rank <= 2);
+    const thirds = seedAll.filter(x => x.rank === 3).sort((a, b) => b.pts - a.pts || b.gf - a.gf).slice(0, 8);
+    const Q = q.concat(thirds).sort((a, b) => b.pts - a.pts || b.gf - a.gf || a.i - b.i);
+    const r32 = [];
+    for (let k = 0; k < 16; k++) r32.push({ home: slot(this.teams[Q[k].i].code), away: slot(this.teams[Q[31 - k].i].code) });
+    const mkMatch = (m, isFinal) => {
+      const teamRow = (sl) => sl ? { code: sl.code, flag: { width: 16, height: 11, borderRadius: 2, flex: 'none', background: sl.flag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.18)' }, style: { display: 'flex', alignItems: 'center', gap: 6, padding: '3px 6px' }, txt: { fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 12.5, color: sl.mine ? '#16ff7a' : sl.alive ? '#eafff0' : '#7f9d8a' } } : { code: 'TBD', flag: { width: 16, height: 11, borderRadius: 2, flex: 'none', background: 'rgba(255,255,255,.07)' }, style: { display: 'flex', alignItems: 'center', gap: 6, padding: '3px 6px' }, txt: { fontFamily: "'Barlow Condensed'", fontWeight: 600, fontSize: 12.5, color: '#46584d' } };
+      const anyMine = (m.home && m.home.mine) || (m.away && m.away.mine);
+      return { home: teamRow(m.home), away: teamRow(m.away), cardStyle: { width: 124, borderRadius: 10, overflow: 'hidden', background: isFinal ? 'linear-gradient(160deg,rgba(255,210,59,.16),rgba(6,22,14,.85))' : anyMine ? 'rgba(0,230,118,.08)' : 'rgba(255,255,255,.04)', border: isFinal ? '1px solid rgba(255,210,59,.4)' : anyMine ? '1px solid rgba(0,230,118,.3)' : '1px solid rgba(255,255,255,.08)', flex: 'none' }, divider: { height: 1, background: 'rgba(255,255,255,.07)' } };
+    };
+    const tbdMatch = () => ({ home: null, away: null });
+    const bracketCols = [
+      { label: 'R32', sub: '16', matches: r32.map(m => mkMatch(m, false)) },
+      { label: 'R16', sub: '8', matches: Array.from({ length: 8 }).map(() => mkMatch(tbdMatch(), false)) },
+      { label: 'QF', sub: '4', matches: Array.from({ length: 4 }).map(() => mkMatch(tbdMatch(), false)) },
+      { label: 'SF', sub: '2', matches: Array.from({ length: 2 }).map(() => mkMatch(tbdMatch(), false)) },
+      { label: 'FINAL', sub: '1', matches: [mkMatch(tbdMatch(), true)] },
+    ].map(col => ({ label: col.label, sub: col.sub, matches: col.matches, colStyle: { display: 'flex', flexDirection: 'column', justifyContent: 'space-around', gap: 8, flex: 'none', height: 720 } }));
+    const mcViewTabs = [['bracket', 'Bracket'], ['results', 'Results']].map(([key, label]) => {
+      const active = s.mcView === key;
+      return { label, onClick: () => this.setMcView(key), style: { flex: 1, height: 38, borderRadius: 11, border: 'none', background: active ? 'linear-gradient(180deg,#1bff84,#00c95f)' : 'transparent', color: active ? '#022a14' : '#8fae9c', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 16, letterSpacing: '1px', cursor: 'pointer' } };
+    });
+    const mcIsBracket = s.mcView === 'bracket', mcIsResults = s.mcView === 'results';
+
+    // ── Admin ──
+    const statusFlow = [['registration_open', 'Open'], ['drawn', 'Drawn'], ['in_progress', 'Live'], ['complete', 'Done'], ['archived', 'Archived']];
+    const curIdx = statusFlow.findIndex(x => x[0] === s.adminStatus);
+    const drawCommitted = curIdx >= 1; // 'drawn' or later
+    const drawMark = drawCommitted ? '✓' : '·';
+    const drawStateLabel = drawCommitted ? 'COMMITTED' : 'PENDING';
+    const drawStateNote = drawCommitted ? 'Allocation locked · irreversible' : 'Runs from the lobby';
+    const statusSteps = statusFlow.map(([key, label], i) => ({
+      label, key,
+      dot: { width: 26, height: 26, borderRadius: 9, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 13, background: i < curIdx ? 'rgba(0,230,118,.2)' : i === curIdx ? 'linear-gradient(180deg,#1bff84,#00c95f)' : 'rgba(255,255,255,.05)', color: i === curIdx ? '#022a14' : i < curIdx ? '#16ff7a' : '#5f7768', border: i <= curIdx ? 'none' : '1px solid rgba(255,255,255,.08)' },
+      labelStyle: { fontSize: 9.5, fontWeight: 600, letterSpacing: '.3px', color: i === curIdx ? '#16ff7a' : '#5f7768', marginTop: 4, textAlign: 'center' },
+      connector: { flex: 1, height: 2, background: i < curIdx ? 'rgba(0,230,118,.4)' : 'rgba(255,255,255,.07)' },
+      showConnector: i < statusFlow.length - 1,
+      mark: i < curIdx ? '✓' : (i + 1),
+    }));
+    const nextStatus = curIdx < statusFlow.length - 1 ? statusFlow[curIdx + 1] : null;
+    const advanceLabel = nextStatus ? 'Advance to ' + nextStatus[1] : 'Archived — final state';
+    const advanceAction = nextStatus ? () => this.setStatus(nextStatus[0]) : () => {};
+
+    const adminPlayers = this.players.map((p, i) => {
+      const removed = !!s.removed[i];
+      return {
+        i, name: p.name, you: p.you, removed,
+        rowStyle: { display: 'flex', alignItems: 'center', gap: 11, padding: '10px 12px', borderRadius: 12, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(255,255,255,.06)', opacity: removed ? 0.45 : 1 },
+        mono: { width: 32, height: 32, borderRadius: 9, flex: 'none', background: `linear-gradient(160deg,${p.color},${p.color}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 13, color: '#04110a' },
+        initials: p.initials,
+        nameStyle: { flex: 1, fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 17, color: removed ? '#7f9d8a' : '#eafff0', textTransform: 'uppercase', textDecoration: removed ? 'line-through' : 'none' },
+        teamCount: this.teams.filter(t => t.owner === i).length + ' teams',
+        onRemove: () => this.removePlayer(i),
+        removeStyle: { padding: '5px 11px', borderRadius: 9, border: removed ? '1px solid rgba(0,230,118,.35)' : '1px solid rgba(255,77,109,.35)', background: removed ? 'rgba(0,230,118,.1)' : 'rgba(255,77,109,.1)', color: removed ? '#16ff7a' : '#ff6b85', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 12, letterSpacing: '.5px', cursor: 'pointer', flex: 'none' },
+        removeLabel: removed ? 'RESTORE' : 'REMOVE',
+      };
+    });
+
+    const auditRows = s.audit.map(a => ({ action: a.action, meta: a.who + ' · ' + a.ago }));
+
+    // ── Invite a player ──
+    const inviteValid = /^\S+@\S+\.\S+$/.test(s.inviteEmail.trim());
+    const inviteSending = s.inviteState === 'sending';
+    const inviteSent = s.inviteState === 'sent';
+    const inviteBtnStyle = { width: '100%', height: 48, border: 'none', borderRadius: 13, background: (inviteValid && !inviteSending) ? 'linear-gradient(180deg,#1bff84,#00c95f)' : 'rgba(255,255,255,.07)', color: (inviteValid && !inviteSending) ? '#022a14' : '#5f7768', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 17, letterSpacing: '.8px', cursor: (inviteValid && !inviteSending) ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9 };
+    const inviteBtnLabel = inviteSending ? 'SENDING…' : 'SEND INVITE';
+    const sentInvites = s.invitesSent.map(iv => ({ email: iv.email, code: iv.code, ago: iv.ago }));
+    const feedOk = s.feedFails === 0;
+    const editFx = this.fixtures[0] || { id: null, h: '', a: '', hs: 0, as: 0, st: 'sched' };
+    const editH = this.byCode(editFx.h) || { code: '—', flag: 'linear-gradient(180deg,#555,#333)', owner: -1 }, editA = this.byCode(editFx.a) || { code: '—', flag: 'linear-gradient(180deg,#555,#333)', owner: -1 };
+    const scoringRules = [
+      ['Group win', '+3'], ['Group draw', '+1'], ['Knockout win', '+3'],
+      ['Reach R16 / QF', '+4 / +8'], ['Reach SF / Final', '+12 / +16'], ['Champion', '+24'], ['Goal scored', '+1'],
+    ].map(([k, v]) => ({ k, v }));
+
+    // ── Match news / detail feed ──
+    const nk = s.newsKey || '';
+    const nd = this.matchNews[nk] || { h: '', a: '', hs: 0, as: 0, status: 'ft', min: 'FT', group: '', stadium: '', headlines: [], events: [] };
+    const nh = this.byCode(nd.h) || { name: '', flag: 'linear-gradient(180deg,#555,#333)', owner: -1 }, na = this.byCode(nd.a) || { name: '', flag: 'linear-gradient(180deg,#555,#333)', owner: -1 };
+    const cmRows = this.commentary ? (this.commentary[nk] || []) : [];
+    const cmFx = (this.fixtures || []).find(f => String(f.id) === nk);
+    const cmSt = cmFx ? cmFx.st : 'ft';
+    const kindMap = {
+      goal: { bg: 'rgba(0,230,118,.16)', bd: 'rgba(0,230,118,.4)', col: '#16ff7a', label: '⚽' },
+      yellow: { bg: 'rgba(255,200,40,.16)', bd: 'rgba(255,200,40,.4)', col: '#ffcc33', label: '' },
+      red: { bg: 'rgba(255,77,109,.16)', bd: 'rgba(255,77,109,.4)', col: '#ff6b85', label: '' },
+      whistle: { bg: 'rgba(255,255,255,.06)', bd: 'rgba(255,255,255,.12)', col: '#9fc8af', label: '' },
+      live: { bg: 'rgba(255,77,109,.16)', bd: 'rgba(255,77,109,.4)', col: '#ff6b85', label: '' },
+    };
+    const ndLive = nd.status === 'live', ndSched = nd.status === 'sched';
+    const newsData = {
+      hName: nh.name, aName: na.name, hCode: nd.h, aCode: nd.a, score: ndSched ? '–' : (nd.hs + '–' + nd.as),
+      hFlag: { width: 56, height: 40, borderRadius: 8, flex: 'none', background: nh.flag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.18),0 4px 12px rgba(0,0,0,.4)' },
+      aFlag: { width: 56, height: 40, borderRadius: 8, flex: 'none', background: na.flag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.18),0 4px 12px rgba(0,0,0,.4)' },
+      hMine: nh.owner === 0, aMine: na.owner === 0,
+      live: ndLive, statusText: ndLive ? (nd.min + ' · LIVE') : ndSched ? ('KICK-OFF · ' + (nd.when || 'TBD')) : 'FULL TIME',
+      statusStyle: { display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 13px', borderRadius: 999, background: ndLive ? 'rgba(255,77,109,.16)' : ndSched ? 'rgba(199,154,58,.14)' : 'rgba(255,255,255,.06)', border: ndLive ? '1px solid rgba(255,77,109,.4)' : ndSched ? '1px solid rgba(199,154,58,.4)' : '1px solid rgba(255,255,255,.12)', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 13, letterSpacing: '1px', color: ndLive ? '#ff6b85' : ndSched ? '#d9b25e' : '#9fc8af' },
+      meta: 'Group ' + nd.group + (nd.stadium ? ' · ' + nd.stadium : ''),
+      headlines: nd.headlines.map((h, i) => ({
+        tag: h.tag, title: h.title, src: h.src, url: h.url,
+        cardStyle: { display: 'block', textDecoration: 'none', color: 'inherit', borderRadius: 16, padding: '15px 16px', background: i === 0 ? 'linear-gradient(160deg,rgba(0,230,118,.13),rgba(6,22,14,.8))' : 'rgba(255,255,255,.035)', border: i === 0 ? '1px solid rgba(0,230,118,.24)' : '1px solid rgba(255,255,255,.07)' },
+        tagStyle: { display: 'inline-block', padding: '2px 8px', borderRadius: 6, background: 'rgba(0,230,118,.18)', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 10.5, letterSpacing: '1px', color: '#16ff7a', marginBottom: 8 },
+      })),
+      events: nd.events.map((ev, i) => {
+        const km = kindMap[ev.kind];
+        const sideFlag = ev.side === 'h' ? nh.flag : ev.side === 'a' ? na.flag : null;
+        return {
+          min: ev.min, title: ev.title, sub: ev.sub, isGoal: ev.kind === 'goal', isLive: ev.kind === 'live', hasSide: !!sideFlag,
+          minStyle: { width: 42, flex: 'none', textAlign: 'right', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 15, color: ev.kind === 'goal' ? '#16ff7a' : '#7fbf98', paddingTop: 2 },
+          iconWrap: { width: 30, height: 30, borderRadius: 9, flex: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', background: km.bg, border: '1px solid ' + km.bd, position: 'relative' },
+          iconDot: { width: ev.kind === 'goal' ? 12 : 0, height: ev.kind === 'goal' ? 12 : 0, borderRadius: '50%', background: 'radial-gradient(circle at 35% 30%,#fff,#cfe9d8)', boxShadow: 'inset 0 0 0 1px rgba(0,0,0,.3)' },
+          cardRect: { width: (ev.kind === 'yellow' || ev.kind === 'red') ? 10 : 0, height: (ev.kind === 'yellow' || ev.kind === 'red') ? 14 : 0, borderRadius: 2, background: km.col, boxShadow: '0 1px 3px rgba(0,0,0,.4)' },
+          liveDot: { width: ev.kind === 'live' ? 9 : 0, height: ev.kind === 'live' ? 9 : 0, borderRadius: '50%', background: '#ff4d6d', animation: 'livedot 1.3s ease-in-out infinite' },
+          whistleDot: { width: ev.kind === 'whistle' ? 9 : 0, height: ev.kind === 'whistle' ? 9 : 0, borderRadius: '50%', background: '#9fc8af' },
+          titleStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 16, lineHeight: 1.05, color: ev.kind === 'goal' ? '#eafff0' : '#cfe9d8' },
+          sideFlagStyle: sideFlag ? { width: 18, height: 13, borderRadius: 3, flex: 'none', background: sideFlag, boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.18)' } : { display: 'none' },
+          connector: { position: 'absolute', left: 14, top: 30, bottom: -14, width: 2, background: i === nd.events.length - 1 ? 'transparent' : 'rgba(255,255,255,.07)' },
+        };
+      }),
+      commentary: cmRows.map(c => ({
+        min: c.minute != null ? (c.minute + "'") : '',
+        title: c.title || '',
+        body: c.body || '',
+        rowStyle: { position: 'relative', borderRadius: 14, padding: '12px 14px', background: c.is_key_event ? 'linear-gradient(160deg,rgba(0,230,118,.12),rgba(6,22,14,.7))' : 'rgba(255,255,255,.035)', border: c.is_key_event ? '1px solid rgba(0,230,118,.28)' : '1px solid rgba(255,255,255,.07)' },
+        minStyle: { display: c.minute != null ? 'inline-block' : 'none', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 13, letterSpacing: '.5px', color: c.is_key_event ? '#16ff7a' : '#7fbf98', marginBottom: 4 },
+        titleStyle: { display: (c.title && String(c.title).length) ? 'block' : 'none', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 17, lineHeight: 1.1, color: '#eafff0', marginBottom: 5 },
+        bodyStyle: { fontSize: 13, lineHeight: 1.4, color: '#a9c6b5' },
+      })),
+      hasCommentary: cmRows.length > 0,
+      noCommentary: cmRows.length === 0,
+      isLiveMatch: nd.status === 'live',
+      emptyText: cmSt === 'live' ? 'No live commentary yet — check back in a moment.' : cmSt === 'sched' ? 'Live commentary appears here once the match kicks off.' : 'No commentary was recorded for this match.',
+    };
+
+    // ── Leaderboard (authoritative; also feeds Home rank/score) ──
+    const board = this.computeBoard();
+    const me = board.find(r => r.you) || { rank: '—', score: 0, alive: 0, goals: 0, move: 0, name: (this.server && this.server.me ? this.server.me.name : 'You') };
+    const myRank = me.rank, myScore = me.score, myAlive = me.alive;
+    const rankSuf = (n) => (n === 1 ? 'st' : n === 2 ? 'nd' : n === 3 ? 'rd' : 'th');
+    const myRankSuf = rankSuf(myRank);
+    const topMover = board.slice().sort((a, b) => b.move - a.move)[0] || { name: '—', move: 0 };
+    const medal = ['#ffd23b', '#cfe0e8', '#e8a06a'];
+    const boardRows = board.map(r => {
+      const open = s.openPlayer === r.i;
+      const mv = r.move;
+      return {
+        i: r.i, name: r.name, you: r.you, score: r.score, rank: r.rank, open, initials: r.initials,
+        onClick: () => this.togglePlayer(r.i),
+        rowStyle: { borderRadius: 18, overflow: 'hidden', background: r.you ? 'linear-gradient(160deg,rgba(0,230,118,.14),rgba(6,22,14,.7))' : 'rgba(255,255,255,.035)', border: r.you ? '1px solid rgba(0,230,118,.32)' : '1px solid rgba(255,255,255,.07)', transition: 'background .2s' },
+        head: { display: 'flex', alignItems: 'center', gap: 12, padding: '13px 14px', cursor: 'pointer' },
+        rankBox: { width: 30, textAlign: 'center', flex: 'none', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: r.rank <= 3 ? 26 : 21, lineHeight: .9, color: r.rank <= 3 ? medal[r.rank - 1] : '#5f7768' },
+        mono: { width: 40, height: 40, borderRadius: 12, flex: 'none', background: `linear-gradient(160deg,${r.color},${r.color}cc)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 17, color: '#04110a', boxShadow: r.you ? '0 0 0 2px #04110a,0 0 0 3px #16ff7a' : 'none' },
+        nm: r.name, nameStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 20, lineHeight: 1, color: r.you ? '#16ff7a' : '#eafff0', textTransform: 'uppercase' },
+        sub: r.alive + ' alive · ' + r.goals + ' goals',
+        moveStyle: { display: 'inline-flex', alignItems: 'center', gap: 3, fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 13, color: mv > 0 ? '#16ff7a' : mv < 0 ? '#ff6b85' : '#5f7768' },
+        moveLabel: (mv > 0 ? '▲ ' : mv < 0 ? '▼ ' : '– ') + (mv !== 0 ? Math.abs(mv) : ''),
+        score: r.score,
+        scoreStyle: { fontFamily: "'Barlow Condensed'", fontWeight: 800, fontSize: 30, lineHeight: .85, color: r.you ? '#16ff7a' : '#eafff0' },
+        chev: { transition: 'transform .25s', transform: open ? 'rotate(180deg)' : 'none', flex: 'none', opacity: .6 },
+        teamChips: r.owned.map(t => ({ name: t.code, alive: this.standings[t.idx].alive, chip: { display: 'flex', alignItems: 'center', gap: 6, padding: '5px 9px 5px 5px', borderRadius: 9, background: 'rgba(255,255,255,.05)', border: '1px solid rgba(255,255,255,.08)', opacity: this.standings[t.idx].alive ? 1 : 0.45 }, fl: { width: 22, height: 15, borderRadius: 3, background: t.flag, flex: 'none', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' }, tx: { fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 13, letterSpacing: '.5px', color: '#cfe9d8' } })),
+        panelStyle: { maxHeight: open ? 200 : 0, overflow: 'hidden', transition: 'max-height .3s ease', borderTop: open ? '1px solid rgba(255,255,255,.08)' : '1px solid transparent' },
+      };
+    });
+
+    const navTabs = [['Landing', 'landing'], ['Lobby', 'lobby'], ['Draw', 'draw'], ['Home', 'home'], ['Pot', 'pot'], ['Board', 'board'], ['Match', 'bracket'], ['Admin', 'admin']].map(([label, key]) => {
+      const active = s.screen === key;
+      return { label, onClick: () => this.go(key), style: { padding: '7px 14px', borderRadius: 999, border: active ? '1px solid rgba(0,230,118,.5)' : '1px solid rgba(255,255,255,.12)', background: active ? 'rgba(0,230,118,.16)' : 'rgba(255,255,255,.04)', color: active ? '#16ff7a' : '#8fae9c', fontFamily: "'Barlow Condensed'", fontWeight: 700, fontSize: 14, letterSpacing: '.8px', cursor: 'pointer' } };
+    });
+
+    return {
+      canvasRef: this.canvasRef,
+      isLanding: s.screen === 'landing', isOnboard: s.screen === 'onboard', isLobby: s.screen === 'lobby', isDraw: s.screen === 'draw', isHome: s.screen === 'home', isPot: s.screen === 'pot', isBoard: s.screen === 'board', isMatch: s.screen === 'bracket', isAdminScreen: s.screen === 'admin', isNews: s.screen === 'matchnews',
+      newsData, backFromNews: this.backFromNews,
+      phasePre: s.drawPhase === 'pre', phaseTearing: s.drawPhase === 'tearing', phaseDealing: s.drawPhase === 'dealing', phaseYours: s.drawPhase === 'yours', phaseDone: s.drawPhase === 'done', tearTopStyle, tearBotStyle,
+      linkSent: s.linkSent, notSent: !s.linkSent, joinCode: s.joinCode, codeChars, email: s.email, onCode: this.onCode, onEmail: this.onEmail, sendLink: this.sendLink, sendBtnStyle, openMagic: this.openMagic,
+      name: s.name, onName: this.onName, monoOptions, previewInitials, previewTileStyle, joinLobby: this.joinLobby, joinBtnStyle,
+      sweepName: this.props.sweepName || 'The Sweep', playersNum: s.playersNum, teamsNum: s.teamsNum, lobbyTiles, isAdmin: s.isAdmin, isPlayer: !s.isAdmin, runDraw: this.runDraw, roleLabel, roleChip,
+      openPack: this.openPack, cells, dealtLabel, dealBarStyle, yourCards, continueToDone: this.continueToDone, enterHome: this.enterHome, yourRows, replay: this.replay,
+      homeSquad, headlineScore, aliveCount, myTeamCount, topTeamSuffix, fixtures, ticker, hasLive, liveLabel, hasTicker, emptyTicker, latestNews, hasNews: latestNews.length > 0, homeMonoStyle, hInit, hName, homeTabs,
+      potSections, potFilters, potAlive,
+      boardRows, myRank, myRankSuf, myScore, myAlive, myMoveLabel: (me.move > 0 ? '▲ up ' + me.move : me.move < 0 ? '▼ down ' + Math.abs(me.move) : '– holding'), topMoverName: topMover.name,
+      mcRows, mcFilters, mcViewTabs, mcIsBracket, mcIsResults, bracketCols,
+      statusSteps, advanceLabel, advanceAction, drawMark, drawStateLabel, drawStateNote, adminCode: s.adminCode, regenCode: this.regenCode, adminPlayers, auditRows, feedOk, lastSync: s.lastSync, feedFails: s.feedFails, syncing: s.syncing, forceRefresh: this.forceRefresh, resetGame: this.resetGame, logout: this.logout, adminEmail: (this.server && this.server.me ? this.server.me.email : ''),
+      inviteEmail: s.inviteEmail, onInviteEmail: this.onInviteEmail, sendInvite: this.sendInvite, inviteBtnStyle, inviteBtnLabel, inviteSending, inviteSent, sentInvites, hasSentInvites: sentInvites.length > 0,
+      scoringRules, syncLabel: s.syncing ? 'SYNCING…' : 'FORCE REFRESH',
+      matchEditOpen: s.matchEdit !== null, openMatchEdit: this.openMatchEdit, closeMatchEdit: this.closeMatchEdit, saveMatchEdit: this.saveMatchEdit,
+      mEditHs: s.mEditHs, mEditAs: s.mEditAs, editHName: editH.code, editAName: editA.code, editHFlag: { width: 30, height: 21, borderRadius: 4, background: editH.flag, flex: 'none', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' }, editAFlag: { width: 30, height: 21, borderRadius: 4, background: editA.flag, flex: 'none', boxShadow: 'inset 0 0 0 1px rgba(255,255,255,.15)' },
+      hMinus: () => this.bumpScore('h', -1), hPlus: () => this.bumpScore('h', 1), aMinus: () => this.bumpScore('a', -1), aPlus: () => this.bumpScore('a', 1),
+      editSourceManual: editFx.source === 'manual',
+      navTabs: [],
+    };
+  }
+}
+</script>
+</body>
+</html>

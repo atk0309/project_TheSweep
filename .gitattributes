@@ -1,0 +1,3 @@
+public/vendor/* linguist-vendored
+public/support.js linguist-generated
+package-lock.json linguist-generated

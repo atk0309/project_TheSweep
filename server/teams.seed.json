@@ -1,0 +1,338 @@
+[
+  {
+    "idx": 0,
+    "code": "BRA",
+    "name": "Brazil",
+    "group_letter": "A",
+    "flag": "linear-gradient(90deg,#009b3a 0 50%,#ffdf00 50% 100%)"
+  },
+  {
+    "idx": 1,
+    "code": "MEX",
+    "name": "Mexico",
+    "group_letter": "A",
+    "flag": "linear-gradient(90deg,#006847 0 33.34%,#ffffff 33.34% 66.67%,#ce1126 66.67% 100%)"
+  },
+  {
+    "idx": 2,
+    "code": "CAN",
+    "name": "Canada",
+    "group_letter": "A",
+    "flag": "linear-gradient(90deg,#ff0000 0 33.34%,#ffffff 33.34% 66.67%,#ff0000 66.67% 100%)"
+  },
+  {
+    "idx": 3,
+    "code": "KSA",
+    "name": "Saudi Arabia",
+    "group_letter": "A",
+    "flag": "linear-gradient(180deg,#006c35 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 4,
+    "code": "USA",
+    "name": "USA",
+    "group_letter": "B",
+    "flag": "linear-gradient(90deg,#3c3b6e 0 33.34%,#ffffff 33.34% 66.67%,#b22234 66.67% 100%)"
+  },
+  {
+    "idx": 5,
+    "code": "NED",
+    "name": "Netherlands",
+    "group_letter": "B",
+    "flag": "linear-gradient(180deg,#ae1c28 0 33.34%,#ffffff 33.34% 66.67%,#21468b 66.67% 100%)"
+  },
+  {
+    "idx": 6,
+    "code": "WAL",
+    "name": "Wales",
+    "group_letter": "B",
+    "flag": "linear-gradient(180deg,#ffffff 0 50%,#00ad1d 50% 100%)"
+  },
+  {
+    "idx": 7,
+    "code": "QAT",
+    "name": "Qatar",
+    "group_letter": "B",
+    "flag": "linear-gradient(90deg,#8a1538 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 8,
+    "code": "ENG",
+    "name": "England",
+    "group_letter": "C",
+    "flag": "linear-gradient(90deg,#ffffff 0 50%,#cf142b 50% 100%)"
+  },
+  {
+    "idx": 9,
+    "code": "ESP",
+    "name": "Spain",
+    "group_letter": "C",
+    "flag": "linear-gradient(180deg,#aa151b 0 33.34%,#f1bf00 33.34% 66.67%,#aa151b 66.67% 100%)"
+  },
+  {
+    "idx": 10,
+    "code": "GER",
+    "name": "Germany",
+    "group_letter": "C",
+    "flag": "linear-gradient(180deg,#000000 0 33.34%,#dd0000 33.34% 66.67%,#ffce00 66.67% 100%)"
+  },
+  {
+    "idx": 11,
+    "code": "FRA",
+    "name": "France",
+    "group_letter": "C",
+    "flag": "linear-gradient(90deg,#0055a4 0 33.34%,#ffffff 33.34% 66.67%,#ef4135 66.67% 100%)"
+  },
+  {
+    "idx": 12,
+    "code": "POR",
+    "name": "Portugal",
+    "group_letter": "D",
+    "flag": "linear-gradient(90deg,#006600 0 50%,#ff0000 50% 100%)"
+  },
+  {
+    "idx": 13,
+    "code": "BEL",
+    "name": "Belgium",
+    "group_letter": "D",
+    "flag": "linear-gradient(90deg,#000000 0 33.34%,#fae042 33.34% 66.67%,#ed2939 66.67% 100%)"
+  },
+  {
+    "idx": 14,
+    "code": "CRO",
+    "name": "Croatia",
+    "group_letter": "D",
+    "flag": "linear-gradient(180deg,#ff0000 0 33.34%,#ffffff 33.34% 66.67%,#171796 66.67% 100%)"
+  },
+  {
+    "idx": 15,
+    "code": "URU",
+    "name": "Uruguay",
+    "group_letter": "D",
+    "flag": "linear-gradient(180deg,#5b92e5 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 16,
+    "code": "ITA",
+    "name": "Italy",
+    "group_letter": "E",
+    "flag": "linear-gradient(90deg,#009246 0 33.34%,#ffffff 33.34% 66.67%,#ce2b37 66.67% 100%)"
+  },
+  {
+    "idx": 17,
+    "code": "COL",
+    "name": "Colombia",
+    "group_letter": "E",
+    "flag": "linear-gradient(180deg,#fcd116 0 33.34%,#003893 33.34% 66.67%,#ce1126 66.67% 100%)"
+  },
+  {
+    "idx": 18,
+    "code": "SUI",
+    "name": "Switzerland",
+    "group_letter": "E",
+    "flag": "linear-gradient(180deg,#d52b1e 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 19,
+    "code": "SEN",
+    "name": "Senegal",
+    "group_letter": "E",
+    "flag": "linear-gradient(90deg,#00853f 0 33.34%,#fdef42 33.34% 66.67%,#e31b23 66.67% 100%)"
+  },
+  {
+    "idx": 20,
+    "code": "DEN",
+    "name": "Denmark",
+    "group_letter": "F",
+    "flag": "linear-gradient(180deg,#c60c30 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 21,
+    "code": "KOR",
+    "name": "South Korea",
+    "group_letter": "F",
+    "flag": "linear-gradient(180deg,#ffffff 0 50%,#cd2e3a 50% 100%)"
+  },
+  {
+    "idx": 22,
+    "code": "ARG",
+    "name": "Argentina",
+    "group_letter": "F",
+    "flag": "linear-gradient(180deg,#75aadb 0 33.34%,#ffffff 33.34% 66.67%,#75aadb 66.67% 100%)"
+  },
+  {
+    "idx": 23,
+    "code": "NGA",
+    "name": "Nigeria",
+    "group_letter": "F",
+    "flag": "linear-gradient(90deg,#008751 0 33.34%,#ffffff 33.34% 66.67%,#008751 66.67% 100%)"
+  },
+  {
+    "idx": 24,
+    "code": "AUS",
+    "name": "Australia",
+    "group_letter": "G",
+    "flag": "linear-gradient(180deg,#00008b 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 25,
+    "code": "GHA",
+    "name": "Ghana",
+    "group_letter": "G",
+    "flag": "linear-gradient(180deg,#ce1126 0 33.34%,#fcd116 33.34% 66.67%,#006b3f 66.67% 100%)"
+  },
+  {
+    "idx": 26,
+    "code": "SRB",
+    "name": "Serbia",
+    "group_letter": "G",
+    "flag": "linear-gradient(180deg,#c6363c 0 33.34%,#0c4076 33.34% 66.67%,#ffffff 66.67% 100%)"
+  },
+  {
+    "idx": 27,
+    "code": "ECU",
+    "name": "Ecuador",
+    "group_letter": "G",
+    "flag": "linear-gradient(180deg,#ffdd00 0 33.34%,#034ea2 33.34% 66.67%,#ed1c24 66.67% 100%)"
+  },
+  {
+    "idx": 28,
+    "code": "POL",
+    "name": "Poland",
+    "group_letter": "H",
+    "flag": "linear-gradient(180deg,#ffffff 0 50%,#dc143c 50% 100%)"
+  },
+  {
+    "idx": 29,
+    "code": "CMR",
+    "name": "Cameroon",
+    "group_letter": "H",
+    "flag": "linear-gradient(90deg,#007a5e 0 33.34%,#ce1126 33.34% 66.67%,#fcd116 66.67% 100%)"
+  },
+  {
+    "idx": 30,
+    "code": "AUT",
+    "name": "Austria",
+    "group_letter": "H",
+    "flag": "linear-gradient(180deg,#ed2939 0 33.34%,#ffffff 33.34% 66.67%,#ed2939 66.67% 100%)"
+  },
+  {
+    "idx": 31,
+    "code": "PER",
+    "name": "Peru",
+    "group_letter": "H",
+    "flag": "linear-gradient(90deg,#d91023 0 33.34%,#ffffff 33.34% 66.67%,#d91023 66.67% 100%)"
+  },
+  {
+    "idx": 32,
+    "code": "CHI",
+    "name": "Chile",
+    "group_letter": "I",
+    "flag": "linear-gradient(180deg,#ffffff 0 33.34%,#0039a6 33.34% 66.67%,#d52b1e 66.67% 100%)"
+  },
+  {
+    "idx": 33,
+    "code": "JPN",
+    "name": "Japan",
+    "group_letter": "I",
+    "flag": "linear-gradient(180deg,#ffffff 0 50%,#bc002d 50% 100%)"
+  },
+  {
+    "idx": 34,
+    "code": "CIV",
+    "name": "Côte d’Ivoire",
+    "group_letter": "I",
+    "flag": "linear-gradient(90deg,#f77f00 0 33.34%,#ffffff 33.34% 66.67%,#009e60 66.67% 100%)"
+  },
+  {
+    "idx": 35,
+    "code": "SCO",
+    "name": "Scotland",
+    "group_letter": "I",
+    "flag": "linear-gradient(180deg,#0065bf 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 36,
+    "code": "TUN",
+    "name": "Tunisia",
+    "group_letter": "J",
+    "flag": "linear-gradient(180deg,#e70013 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 37,
+    "code": "SWE",
+    "name": "Sweden",
+    "group_letter": "J",
+    "flag": "linear-gradient(180deg,#006aa7 0 50%,#fecc00 50% 100%)"
+  },
+  {
+    "idx": 38,
+    "code": "NOR",
+    "name": "Norway",
+    "group_letter": "J",
+    "flag": "linear-gradient(90deg,#ba0c2f 0 33.34%,#ffffff 33.34% 66.67%,#00205b 66.67% 100%)"
+  },
+  {
+    "idx": 39,
+    "code": "GRE",
+    "name": "Greece",
+    "group_letter": "J",
+    "flag": "linear-gradient(180deg,#0d5eaf 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 40,
+    "code": "EGY",
+    "name": "Egypt",
+    "group_letter": "K",
+    "flag": "linear-gradient(180deg,#ce1126 0 33.34%,#ffffff 33.34% 66.67%,#000000 66.67% 100%)"
+  },
+  {
+    "idx": 41,
+    "code": "CRC",
+    "name": "Costa Rica",
+    "group_letter": "K",
+    "flag": "linear-gradient(180deg,#002b7f 0 33.34%,#ffffff 33.34% 66.67%,#ce1126 66.67% 100%)"
+  },
+  {
+    "idx": 42,
+    "code": "ALG",
+    "name": "Algeria",
+    "group_letter": "K",
+    "flag": "linear-gradient(90deg,#006233 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 43,
+    "code": "PAN",
+    "name": "Panama",
+    "group_letter": "K",
+    "flag": "linear-gradient(180deg,#005293 0 33.34%,#ffffff 33.34% 66.67%,#d21034 66.67% 100%)"
+  },
+  {
+    "idx": 44,
+    "code": "MAR",
+    "name": "Morocco",
+    "group_letter": "L",
+    "flag": "linear-gradient(180deg,#c1272d 0 50%,#006233 50% 100%)"
+  },
+  {
+    "idx": 45,
+    "code": "TUR",
+    "name": "Türkiye",
+    "group_letter": "L",
+    "flag": "linear-gradient(90deg,#e30a17 0 50%,#ffffff 50% 100%)"
+  },
+  {
+    "idx": 46,
+    "code": "UKR",
+    "name": "Ukraine",
+    "group_letter": "L",
+    "flag": "linear-gradient(180deg,#0057b7 0 50%,#ffd700 50% 100%)"
+  },
+  {
+    "idx": 47,
+    "code": "PAR",
+    "name": "Paraguay",
+    "group_letter": "L",
+    "flag": "linear-gradient(180deg,#d52b1e 0 33.34%,#ffffff 33.34% 66.67%,#0038a8 66.67% 100%)"
+  }
+]
