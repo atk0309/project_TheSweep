@@ -7,12 +7,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/atk0309/the-sweep.git"
+    "url": "git+https://github.com/atk0309/project_TheSweep.git"
   },
   "bugs": {
-    "url": "https://github.com/atk0309/the-sweep/issues"
+    "url": "https://github.com/atk0309/project_TheSweep/issues"
   },
-  "homepage": "https://github.com/atk0309/the-sweep#readme",
+  "homepage": "https://github.com/atk0309/project_TheSweep#readme",
   "keywords": [
     "football",
     "sweepstake",
