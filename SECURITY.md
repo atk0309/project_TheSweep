@@ -7,7 +7,7 @@ Security fixes are applied to the current `main` branch.
 ## Report a vulnerability
 
 Please use [GitHub private vulnerability
-reporting](https://github.com/atk0309/the-sweep/security/advisories/new).
+reporting](https://github.com/atk0309/project_TheSweep/security/advisories/new).
 Do not disclose authentication bypasses, tokens, personal data, or exploitable
 deployment details in a public issue.
 

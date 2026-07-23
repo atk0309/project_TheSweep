@@ -137,7 +137,7 @@ instance.
 ## Security and licence
 
 Please report vulnerabilities through [GitHub private vulnerability
-reporting](https://github.com/atk0309/the-sweep/security/advisories/new), not a
+reporting](https://github.com/atk0309/project_TheSweep/security/advisories/new), not a
 public issue. See [SECURITY.md](SECURITY.md).
 
 Project-authored code and assets are available under the [MIT
