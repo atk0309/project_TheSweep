@@ -140,7 +140,6 @@ Please report vulnerabilities through [GitHub private vulnerability
 reporting](https://github.com/atk0309/the-sweep/security/advisories/new), not a
 public issue. See [SECURITY.md](SECURITY.md).
 
-The repository is publicly viewable but is not currently offered under an
-open-source licence. Project-authored material remains all rights reserved.
-Third-party components retain their own licences; see [LICENSE](LICENSE) and
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Project-authored code and assets are available under the [MIT
+License](LICENSE). Third-party components and provider content retain their own
+licences and terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
