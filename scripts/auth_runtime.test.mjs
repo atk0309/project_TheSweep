@@ -159,3 +159,34 @@ test('production delivery failures propagate without logging recipient or token'
   assert.doesNotMatch(output, /secret-token/);
   assert.match(output, /delivery failed/);
 });
+
+test('successful production delivery passes the expected provider payload', async () => {
+  const sent = [];
+  const sender = createMagicLinkSender({
+    mailClient: {
+      emails: {
+        send: async (payload) => {
+          sent.push(payload);
+          return { data: { id: 'email-id' }, error: null };
+        },
+      },
+    },
+    runtimeConfig: {
+      isProd: true,
+      emailFrom: 'The Sweep <sender@example.test>',
+    },
+  });
+  const result = await sender(
+    'player@example.test',
+    'https://app.example.test/auth/verify?token=provider-contract',
+    { invite: true },
+  );
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0].from, 'The Sweep <sender@example.test>');
+  assert.equal(sent[0].to, 'player@example.test');
+  assert.match(sent[0].subject, /claim your spot/i);
+  assert.match(sent[0].html, /provider-contract/);
+  assert.match(sent[0].text, /provider-contract/);
+});
