@@ -73,7 +73,7 @@ app.get('/', (_req, res) => {
 app.use(express.static(PUBLIC_DIR, { index: false }));
 
 // SPA-ish fallback: anything else renders the app shell (client routes by state).
-app.get('*', (req, res, next) => {
+app.get('/{*splat}', (req, res, next) => {
   if (req.path.startsWith('/api') || req.path.startsWith('/auth')) return next();
   res.set('Cache-Control', 'no-cache');
   res.sendFile(join(PUBLIC_DIR, 'Sweepstake.dc.html'));
