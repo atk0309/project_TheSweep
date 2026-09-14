@@ -43,6 +43,6 @@
     "resend": "^6.27.0"
   },
   "devDependencies": {
-    "playwright": "^1.61.1"
+    "playwright": "^1.63.0"
   }
 }
