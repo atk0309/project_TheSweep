@@ -37,7 +37,7 @@
   "dependencies": {
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.6",
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.23.0",
     "resend": "^6.27.0"
